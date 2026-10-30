@@ -1,10 +1,12 @@
-# showFPS
+# showFPS — geliştirici notları
 
-(0.1.13'e kadar adı "Custom Performance Overlay" idi.)
+Kullanıcıya yönelik tanıtım için kökteki [README](../README.md). Elle test adımları: [TEST-REHBERI.md](TEST-REHBERI.md). Sürüm notları: [CHANGELOG.md](../CHANGELOG.md).
+
+(0.1.13'e kadar adı "Custom Performance Overlay" idi; 0.1.14'e kadar proje depoda `cpo/` alt klasöründeydi.)
 
 Tauri 2 + Rust + React/TypeScript + Vite. Windows 10/11 için özelleştirilebilir performans overlay'i.
 
-## Kurulum (Windows)
+## Geliştirme ortamı (Windows)
 1. Node.js 20+, Rust (rustup, MSVC toolchain + "Desktop development with C++") ve .NET 10 SDK kurun. WebView2 Windows 11'de hazır gelir.
 2. `npm install`
 3. `npm run build:helper` — sensör yardımcısını (`helper/`) derleyip `src-tauri/binaries/` altına koyar. **`tauri dev`'den önce gereklidir**; yoksa Rust derlemesi sidecar dosyası bulunamadı hatası verir.
@@ -151,14 +153,27 @@ PresentMon'un kullandığı ETW sağlayıcıları (Microsoft-Windows-DXGI ve D3D
 - `tauri-plugin-updater`: açılıştan 15 sn sonra sessizce, ayrıca Ayarlar → Hakkında → "Güncellemeleri denetle". Yeni sürüm varsa panelde şerit çıkar; kurulum uygulamayı kapatıp yeni sürümü açar (oturum kaydı sürerken düğme kapalı).
 - Adres: `tauri.conf.json → plugins.updater.endpoints` = `https://github.com/aknlevt-coder/showFPS/releases/latest/download/latest.json`. Depoda henüz sürüm yokken denetim "bulunamadı" hatası verir.
 - Paketler bir anahtarla imzalanır; uygulama yalnız bu anahtarla imzalı paketi kurar. Özel anahtar depo dışında: `%USERPROFILE%\.tauri\cpo-updater.key` (parolasız). **Kaybolursa kurulu uygulamalar yeni sürümü kabul etmez; yedekleyin.** Açık anahtar `tauri.conf.json`'da.
-- Yayın: `npm run release` → `release/v<sürüm>/` içinde `showFPS_<sürüm>_x64-setup.exe` ve `latest.json`. github.com/aknlevt-coder/showFPS → Releases → Draft a new release → etiket `v<sürüm>` (ör. `v0.1.13`) → iki dosyayı sürükle → Publish release. Etiket adı `latest.json`'daki adresle aynı olmalı.
-- Doğrulanan: imzalı `.sig` ve `latest.json` üretimi. Uçtan uca güncelleme (GitHub'dan indirip kurma) depo olmadığı için denenmedi.
+- Yayın: `npm run release` → `release/v<sürüm>/` içinde `showFPS_<sürüm>_x64-setup.exe` ve `latest.json`. github.com/aknlevt-coder/showFPS → Releases → Draft a new release → etiket `v<sürüm>` (ör. `v0.1.15`) → iki dosyayı sürükle → Publish release. Etiket adı `latest.json`'daki adresle aynı olmalı.
+- Güncelleme notu `CHANGELOG.md`'deki `## <sürüm>` bölümünden alınır; bölüm yoksa `npm run release` derlemeden önce durur.
+- Doğrulanan: imzalı `.sig` ve `latest.json` üretimi. Uçtan uca güncelleme (GitHub'dan indirip kurma) henüz denenmedi.
 
 ## Kod imzalama
 - `bundle.windows.signCommand` → `scripts/sign.mjs`: uygulama, yardımcı, kurulum ve kaldırıcı exe'leri için çağrılır. Sertifika yoksa imzalamadan geçer (SmartScreen "tanınmayan uygulama" uyarısı kalır).
 - Sertifika alınınca yalnız ortam değişkeni yeter: `.pfx` için `CPO_SIGN_PFX` + `CPO_SIGN_PFX_PASSWORD`; Azure Trusted Signing için `CPO_SIGN_AZURE_DLIB` + `CPO_SIGN_AZURE_METADATA` (Windows SDK'daki signtool kullanılır).
 - Sertifikasız yol denendi (derleme imzasız geçiyor); gerçek sertifikayla imzalama denenmedi.
 
+## Güvenlik
+Uygulama her zaman yönetici yetkisiyle çalışır (FPS için ETW, CPU sıcaklığı için sürücü). Bu yüzden arayüzün ve yardımcı araçların yapabildikleri bilerek daraltıldı:
+- **Kurulum yeri:** Program Files (yalnız yönetici yazabilir). Otomatik başlatma görevi exe'yi UAC sormadan yönetici olarak açtığı için exe'nin kullanıcı yetkisiyle değiştirilemeyen bir yerde olması gerekir.
+- **Otomatik başlatma görevi** (`src-tauri/src/autostart.rs`): görev tanımı diske yazılmaz; PowerShell `Register-ScheduledTask` ile `-EncodedCommand` üzerinden verilir. Önceden Temp'e yazılan XML, okunmadan önce yetkisiz bir program tarafından değiştirilip yönetici görevi olarak kaydettirilebilirdi. `schtasks.exe` ve `powershell.exe` System32'den tam yolla çağrılır (PATH'teki sahte bir exe çalışmasın). Kayıt yolu `cargo test -- --ignored` ile gerçek Görev Zamanlayıcı'da denenir.
+- **Dosya yazma:** arayüz diske yol vererek yazamaz. CSV dışa aktarmada kaydetme penceresini Rust açar (`export_csv`); yalnız kullanıcının seçtiği dosyaya yazılır. Oturum kimlikleri harf, rakam ve tire ile sınırlı (`sessions.rs` → `check_id`).
+- **Yardımcıya komut:** yalnız `frames on` / `frames off` geçer (`helper_command`).
+- **İçerik güvenlik politikası (CSP):** yalnız uygulamanın kendi dosyaları; satır içi betik, `eval`, dış adres yok. `freezePrototype` açık. Geliştirme sunucusunda (`devCsp: null`) uygulanmaz.
+- **İzinler** (`src-tauri/capabilities`): overlay penceresi yalnız kendi boyutunu/konumunu değiştirebilir ve sürüklenebilir; panel izinleri ayrı. Kaydetme penceresi izni (`dialog:allow-save`) kaldırıldı.
+- **Güncelleme:** yalnız HTTPS ve imza doğrulamalı (minisign). Özel anahtar depo dışında; `.gitignore` `*.key`, `*.pfx`, `.env` dosyalarını dışarıda tutar.
+- **Bağımlılıklar:** `npm audit` temiz (vite 6.4.5). Rust tarafı için `cargo audit` kurulu değil, denenmedi.
+- Bilinen sınır: `.pfx` ile imzalarken parola signtool'a komut satırından geçer (aynı bilgisayardaki süreç listesinde görünebilir); yalnız derleme bilgisayarını ilgilendirir.
+
 ## Sonraki adım
-- İlk GitHub sürümünü yayımlamak (0.1.13), sonraki sürümle uçtan uca güncellemeyi denemek.
-- İsteğe bağlı: kod imzalama sertifikası.
+- İlk GitHub sürümünü yayımlamak (0.1.15), sonraki sürümle uçtan uca güncellemeyi denemek.
+- İsteğe bağlı: kod imzalama sertifikası, `cargo audit`, derlemeyi denetleyen GitHub Actions iş akışı.

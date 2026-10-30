@@ -21,6 +21,14 @@ if (!process.env.TAURI_SIGNING_PRIVATE_KEY && !existsSync(keyPath)) {
 // --no-bump: derleme yarıda kaldıysa aynı sürümü yeniden dene.
 if (!process.argv.includes("--no-bump")) run("npm version patch --no-git-tag-version");
 const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
+
+// Güncelleme notu CHANGELOG.md'deki "## <sürüm>" bölümünden; yoksa derlemeden önce dur.
+const changelog = readFileSync(join(root, "CHANGELOG.md"), "utf8").replace(/\r/g, "");
+const section = new RegExp(`^## ${version.replace(/\./g, "\\.")}[ \\t]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "m").exec(changelog);
+const notes = section?.[1].trim();
+if (!notes) {
+  throw new Error(`CHANGELOG.md içinde "## ${version}" bölümü yok. Ekleyip "node scripts/release.mjs --no-bump" ile sürdürün.`);
+}
 run("npx tauri build", {
   TAURI_SIGNING_PRIVATE_KEY: process.env.TAURI_SIGNING_PRIVATE_KEY ?? readFileSync(keyPath, "utf8"),
   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? "",
@@ -40,7 +48,7 @@ const endpoint = conf.plugins.updater.endpoints[0];
 const repo = /github\.com\/([^/]+\/[^/]+)\/releases/.exec(endpoint)?.[1];
 const latest = {
   version,
-  notes: `showFPS ${version}`,
+  notes,
   pub_date: new Date().toISOString(),
   platforms: {
     "windows-x86_64": {

@@ -13,7 +13,6 @@
     "notification:allow-notify",
     "notification:allow-is-permission-granted",
     "notification:allow-request-permission",
-    "dialog:allow-save",
     "updater:default",
     "process:allow-restart"
   ]

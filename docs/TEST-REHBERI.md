@@ -4,7 +4,7 @@ Her sürümden sonra bu sırayla bakın. Her adımın yanında **ne görmeniz ge
 
 ## 0. Hazırlık
 1. Çalışan uygulamayı tepsi simgesinden **Çıkış** ile kapatın (görev çubuğundaki X yetmez, tepsiye iner).
-2. `src-tauri\target\release\bundle\nsis\` klasöründeki **en yüksek sürüm numaralı** paketi kurun (ör. `showFPS_0.1.14_x64-setup.exe`). 0.1.12'den beri kurulum UAC ister ve Program Files'a kurar.
+2. `src-tauri\target\release\bundle\nsis\` klasöründeki **en yüksek sürüm numaralı** paketi kurun (ör. `showFPS_0.1.15_x64-setup.exe`). 0.1.12'den beri kurulum UAC ister ve Program Files'a kurar.
    Kurduktan sonra panelin sol altındaki sürümün aynı olduğuna bakın; üzerine gelince derleme tarihi görünür.
 3. Başlat menüsünden açın, UAC'yi onaylayın.
 
@@ -95,10 +95,10 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 | Uygulama ayarları → **Rehberi yeniden göster** → son adımda **Oyunlarımı ekle** | Rehber kapanır, Oyunlar sayfası açılır. |
 | Uygulamadan çıkıp yeniden açın | Rehber bir daha çıkmaz. |
 
-## 3e. Program Files kurulumu, ad, kimlik, dil ve güncelleme (0.1.14)
+## 3e. Program Files kurulumu, ad, kimlik, dil ve güncelleme (0.1.15)
 | Adım | Beklenen |
 |---|---|
-| 0.1.11 kuruluyken 0.1.14 paketini çalıştırın | Kurulum UAC ister. Çalışan uygulama kapatılır. Bittiğinde `C:\Program Files\showFPS\` oluşur, `%LOCALAPPDATA%\Custom Performance Overlay\` silinir. |
+| 0.1.11 ya da 0.1.14 kuruluyken 0.1.15 paketini çalıştırın | Kurulum UAC ister. Çalışan uygulama kapatılır. Bittiğinde `C:\Program Files\showFPS\` oluşur, `%LOCALAPPDATA%\Custom Performance Overlay\` silinir. |
 | Masaüstü / Başlat menüsü / görev çubuğu | Yeni mor "çerçeveli S" simgesi ve "showFPS" adı; eski "Custom Performance Overlay" kısayolu kalmaz. |
 | Görev Zamanlayıcı (otomatik başlatma açıksa) | Uygulama bir kez açıldıktan sonra yalnız `showFPS` görevi var; `Custom Performance Overlay` görevi yok. |
 | Ayarlar → Uygulamalar listesi | Uygulama **bir kez** görünür (eski kullanıcı kurulumu kalmaz). |
@@ -109,8 +109,16 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 | Oturumlar → bir oturum → CSV (İngilizce) | Excel'de virgül ayraçlı, İngilizce başlıklı açılır. |
 | Türkçeye geri dönün | Her şey Türkçe. |
 | Ayarlar → Hakkında → **Güncellemeleri denetle** (GitHub'da sürüm yokken) | Hata mesajı beklenir. |
-| `release\v0.1.14\` içindeki iki dosyayı GitHub'da `v0.1.14` sürümü olarak yayımlayın, yine denetleyin | "En son sürümü kullanıyorsunuz." |
-| Sonraki sürümü (0.1.15) yayımlayınca | Panelde "Yeni sürüm hazır" şeridi; Kur → uygulama kapanıp yeni sürümle açılır. |
+| `release\v0.1.15\` içindeki iki dosyayı GitHub'da `v0.1.15` sürümü olarak yayımlayın, yine denetleyin | "En son sürümü kullanıyorsunuz." |
+| Sonraki sürümü (0.1.16) yayımlayınca | Panelde "Yeni sürüm hazır" şeridi; Kur → uygulama kapanıp yeni sürümle açılır. |
+
+## 3f. Güvenlik değişiklikleri (0.1.15)
+| Adım | Beklenen |
+|---|---|
+| Uygulama ayarları → "Windows açılınca başlat"ı kapatıp açın | Hata yok; Görev Zamanlayıcı'da `showFPS` görevi var, "En yüksek ayrıcalıklarla" çalışır. |
+| Bilgisayarı yeniden başlatın | Overlay UAC sormadan gelir. |
+| Oturumlar → bir oturum → CSV | Windows kaydetme penceresi açılır; seçtiğiniz yere `.csv` olarak kaydedilir. Vazgeçince mesaj çıkmaz. |
+| Panelin tüm sayfalarını gezin, overlay'i sürükleyin | Boş sayfa ya da eksik görünüm yok (yeni içerik güvenlik politikası bir şeyi engellemiyor). |
 
 ## 4. Kalıcılık ve başlangıç
 | Adım | Beklenen |

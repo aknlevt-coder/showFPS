@@ -1,2 +1,10 @@
-# Auto detect text files and perform LF normalization
+# Metin dosyaları depoda LF; Windows'ta çıkışta Git ayarına göre CRLF olabilir.
 * text=auto
+
+# İkili dosyalar: satır sonu dönüşümü yapılmasın, fark gösterilmesin.
+*.ico binary
+*.png binary
+*.bmp binary
+
+# Manifest Windows tarafından okunur; saf ASCII ve CRLF kalsın.
+*.manifest text eol=crlf

@@ -1,2 +1,38 @@
-# Claude Code / editör yerel ayarları (uygulamanın parçası değil)
+# Bağımlılıklar
+node_modules/
+
+# Derleme çıktıları
+dist/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/binaries/
+helper/bin/
+helper/obj/
+helper/publish/
+
+# Yayın dosyaları (GitHub Releases'e elle yüklenir; scripts/release.mjs üretir)
+release/
+
+# İmza anahtarları ve sertifikalar: asla depoya girmemeli
+*.key
+*.key.pub
+*.pfx
+*.p12
+*.pem
+.env
+.env.*
+
+# Günlükler ve geçici dosyalar
+*.log
+npm-debug.log*
+*.tmp
+
+# Editör / işletim sistemi / Claude Code yerel ayarları
 .claude/
+.vscode/
+.idea/
+*.suo
+*.user
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -93,11 +93,12 @@ function SessionDetail({ id, onBack, onDelete }: { id: string; onBack: () => voi
 
   const exportCsv = async (kind: "samples" | "frames") => {
     if (!d) return;
-    const { save } = await import("@tauri-apps/plugin-dialog");
-    const path = await save({ defaultPath: `${d.id}-${kind === "samples" ? L("saniyelik", "per-second") : L("kareler", "frames")}.csv`, filters: [{ name: "CSV", extensions: ["csv"] }] });
-    if (!path) return;
+    const fileName = `${d.id}-${kind === "samples" ? L("saniyelik", "per-second") : L("kareler", "frames")}.csv`;
     const contents = kind === "samples" ? samplesCsv(d.samples) : framesCsv(d.frames);
-    await invoke("write_csv", { path, contents }).then(() => setMsg(`${L("Kaydedildi", "Saved")}: ${path}`)).catch((e) => setMsg(`${L("Kaydedilemedi", "Could not save")}: ${e}`));
+    // Kaydetme penceresi Rust tarafında açılır (yol arayüzden verilmez).
+    await invoke<string | null>("export_csv", { fileName, contents })
+      .then((path) => { if (path) setMsg(`${L("Kaydedildi", "Saved")}: ${path}`); })
+      .catch((e) => setMsg(`${L("Kaydedilemedi", "Could not save")}: ${e}`));
   };
 
   if (!d) return <Card><p className="hint">{msg || L("Yükleniyor…", "Loading…")}</p></Card>;

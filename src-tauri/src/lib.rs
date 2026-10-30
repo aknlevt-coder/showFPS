@@ -196,14 +196,24 @@ fn delete_session(app: AppHandle, id: String) -> Result<(), String> {
     sessions::delete(&app, &id)
 }
 
-/// CSV dışa aktarma: yol kaydetme penceresinden gelir; yalnız .csv yazılır.
+/// CSV dışa aktarma. Kaydetme penceresi burada açılır: uygulama yönetici yetkisiyle çalıştığı
+/// için yol arayüzden alınsaydı arayüz diskte herhangi bir yere yazabilirdi; böylece yalnız
+/// kullanıcının seçtiği dosyaya yazılır. Döndürür: kaydedilen yol, vazgeçildiyse None.
 #[tauri::command]
-fn write_csv(path: String, contents: String) -> Result<(), String> {
-    if !path.to_ascii_lowercase().ends_with(".csv") {
-        return Err("yalnızca .csv dosyası yazılabilir".into());
+async fn export_csv(app: AppHandle, file_name: String, contents: String) -> Result<Option<String>, String> {
+    use tauri_plugin_dialog::DialogExt;
+    // Önerilen ad yalnız ad olsun (klasör ayırıcısı ya da sürücü harfi taşımasın).
+    let name: String = file_name.chars().filter(|c| !matches!(c, '\\' | '/' | ':')).collect();
+    let Some(picked) = app.dialog().file().set_file_name(&name).add_filter("CSV", &["csv"]).blocking_save_file() else {
+        return Ok(None);
+    };
+    let mut path = picked.into_path().map_err(|e| e.to_string())?;
+    if !path.extension().is_some_and(|e| e.eq_ignore_ascii_case("csv")) {
+        path.set_extension("csv");
     }
     // Excel'in Türkçe karakterleri doğru açması için UTF-8 BOM.
-    fs::write(&path, format!("\u{feff}{contents}")).map_err(|e| e.to_string())
+    fs::write(&path, format!("\u{feff}{contents}")).map_err(|e| e.to_string())?;
+    Ok(Some(path.to_string_lossy().into_owned()))
 }
 
 #[tauri::command]
@@ -401,7 +411,7 @@ pub fn run() {
             list_sessions,
             get_session,
             delete_session,
-            write_csv,
+            export_csv,
             set_tray_labels
         ])
         .setup(|app| {

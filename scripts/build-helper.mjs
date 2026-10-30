@@ -17,3 +17,6 @@ const dest = join(root, "src-tauri", "binaries");
 mkdirSync(dest, { recursive: true });
 copyFileSync(join(root, "helper", "publish", "lhm-helper.exe"), join(dest, `lhm-helper-${triple}.exe`));
 console.log(`Kopyalandı: src-tauri/binaries/lhm-helper-${triple}.exe`);
+
+// Kuruluma gömülen PawnIO kurulumu (tauri.conf.json → bundle.resources); dev derlemesi de ister.
+run("node scripts/fetch-pawnio.mjs");

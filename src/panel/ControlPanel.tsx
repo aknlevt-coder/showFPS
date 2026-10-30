@@ -524,7 +524,7 @@ function SensorBadge({ st, ok, okText, cpu }: { st: SensorStatus | null; ok: boo
   if (ok) return <span className="badge ok">{okText}</span>;
   switch (st?.state) {
     case "running":
-      if (cpu && st.info?.pawnIO === false) return <span className="badge warn">{L("PawnIO sürücüsü kurulu değil (CPU sıcaklığı için gerekli)", "PawnIO driver not installed (needed for CPU temperature)")}</span>;
+      if (cpu && st.info?.pawnIO === false) return <PawnIoInstall />;
       return st.info?.isAdmin
         ? <span className="badge">{L("Sensör değer vermiyor", "Sensor reports no value")}</span>
         : <span className="badge warn">{L("Okunamadı — yönetici olarak çalıştırın (CPU sıcaklığı sürücü ister)", "Not readable — run as administrator (CPU temperature needs a driver)")}</span>;
@@ -532,6 +532,34 @@ function SensorBadge({ st, ok, okText, cpu }: { st: SensorStatus | null; ok: boo
     case "missing": case "stopped": case "error": return <span className="badge warn">{helperMessage(st)}</span>;
     default: return <span className="badge">{L("Bekleniyor…", "Waiting…")}</span>;
   }
+}
+
+/**
+ * PawnIO eksikse: resmi kurulum dosyasını indirip (imzası doğrulanarak) kurulum penceresini açar.
+ * Başarılı olunca Rust sensör yardımcısını yeniden başlatır; rozet kendiliğinden "Canlı" olur.
+ */
+function PawnIoInstall() {
+  const [st, setSt] = useState<"idle" | "busy" | "reboot" | "cancelled" | "error">("idle");
+  const [err, setErr] = useState("");
+  const run = () => {
+    setSt("busy");
+    setErr("");
+    invoke<"installed" | "reboot" | "cancelled">("install_pawnio")
+      .then((r) => setSt(r === "installed" ? "idle" : r))
+      .catch((e) => { setErr(String(e)); setSt("error"); });
+  };
+  return (
+    <span className="pawnio">
+      <span className="badge warn">{L("PawnIO sürücüsü kurulu değil (CPU sıcaklığı için gerekli)", "PawnIO driver not installed (needed for CPU temperature)")}</span>
+      <button className="btn ghost" disabled={st === "busy"} onClick={run}
+        title={L("Resmi kurulum dosyasını pawnio.eu yayıncısından indirir, imzasını doğrular ve kurulum penceresini açar.", "Downloads the official installer from the pawnio.eu publisher, verifies its signature and opens the setup window.")}>
+        <Download size={14} /> {st === "busy" ? L("Kuruluyor…", "Installing…") : L("PawnIO'yu kur", "Install PawnIO")}
+      </button>
+      {st === "reboot" && <small className="hint">{L("Kuruldu; CPU sıcaklığı için Windows'u yeniden başlatın.", "Installed; restart Windows to read CPU temperature.")}</small>}
+      {st === "cancelled" && <small className="hint">{L("Kurulumdan vazgeçildi.", "Setup was cancelled.")}</small>}
+      {st === "error" && <small className="hint err">{L("Kurulamadı", "Could not install")}: {err}</small>}
+    </span>
+  );
 }
 
 /** Yardımcının durum mesajı arayüz dilinde; Rust'tan gelen ayrıntı (işletim sistemi hatası) eklenir. */
@@ -722,6 +750,7 @@ function HotkeysCard({ errors }: { errors: Partial<Record<HotkeyAction, string>>
 
 const CREDITS: { name: string; use: string; license: string; url: string }[] = [
   { name: "LibreHardwareMonitor", get use() { return L("Sıcaklık, GPU ve VRAM sensörleri", "Temperature, GPU and VRAM sensors"); }, license: "MPL-2.0", url: "github.com/LibreHardwareMonitor/LibreHardwareMonitor" },
+  { name: "PawnIO", get use() { return L("CPU sıcaklığı sürücüsü (kurulumla birlikte gelir)", "CPU temperature driver (installed with the app)"); }, license: "GPL-2.0", url: "github.com/namazso/PawnIO" },
   { name: "Microsoft TraceEvent", get use() { return L("FPS ölçümü (ETW)", "FPS measurement (ETW)"); }, license: "MIT", url: "github.com/microsoft/perfview" },
   { name: "Tauri", get use() { return L("Masaüstü uygulama çatısı", "Desktop app framework"); }, license: "MIT / Apache-2.0", url: "tauri.app" },
   { name: "sysinfo", get use() { return L("CPU kullanımı ve RAM", "CPU usage and RAM"); }, license: "MIT", url: "github.com/GuillaumeGomez/sysinfo" },
@@ -778,7 +807,7 @@ function AboutCard() {
           ))}
         </tbody>
       </table>
-      <p className="hint">{L("LibreHardwareMonitor, MPL-2.0 lisansıyla değiştirilmeden dağıtılır; kaynak kodu yukarıdaki adreste bulunur.", "LibreHardwareMonitor is distributed unmodified under the MPL-2.0 licence; its source code is at the address above.")}</p>
+      <p className="hint">{L("LibreHardwareMonitor (MPL-2.0) ve PawnIO (GPL-2.0) değiştirilmeden dağıtılır; kaynak kodları yukarıdaki adreslerde bulunur.", "LibreHardwareMonitor (MPL-2.0) and PawnIO (GPL-2.0) are distributed unmodified; their source code is at the addresses above.")}</p>
     </Card>
   );
 }

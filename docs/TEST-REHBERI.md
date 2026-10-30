@@ -120,6 +120,20 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 | Oturumlar → bir oturum → CSV | Windows kaydetme penceresi açılır; seçtiğiniz yere `.csv` olarak kaydedilir. Vazgeçince mesaj çıkmaz. |
 | Panelin tüm sayfalarını gezin, overlay'i sürükleyin | Boş sayfa ya da eksik görünüm yok (yeni içerik güvenlik politikası bir şeyi engellemiyor). |
 
+## 3g. PawnIO kurulumu (0.1.17, PawnIO kurulu olmayan bir bilgisayarda)
+| Adım | Beklenen |
+|---|---|
+| showFPS'i kurun (kurulum ayrıntılarını gösterin) | "PawnIO sürücüsü kuruluyor…" satırı; ayrı bir pencere açılmaz. Uygulama açılınca CPU sıcaklığı "Canlı". Gerekirse bitiş sayfası yeniden başlatmayı önerir. |
+| Ayarlar → Uygulamalar | showFPS ve ayrıca PawnIO görünür. |
+| showFPS'i kaldırın | PawnIO yerinde kalır. |
+| Aşağıdakiler yalnız PawnIO sonradan kaldırıldıysa: | |
+| Genel bakış → Veri kaynakları | CPU sıcaklığı satırında sarı "PawnIO sürücüsü kurulu değil" ve **PawnIO'yu kur** düğmesi. |
+| Düğmeye basın | Birkaç saniye "Kuruluyor…", sonra PawnIO'nun kendi kurulum penceresi açılır. |
+| Kurulumu bitirin | Birkaç saniye içinde CPU sıcaklığı "Canlı" olur (gerekirse Windows'u yeniden başlatma mesajı çıkar). |
+| Kurulum penceresinde vazgeçin | "Kurulumdan vazgeçildi." |
+| İlk açılış rehberi → 2. adım | Aynı düğme orada da var. |
+| Yeni kurulumda ilk açılış rehberi → 3. adım | Dört tercihin hepsi kapalı. |
+
 ## 4. Kalıcılık ve başlangıç
 | Adım | Beklenen |
 |---|---|

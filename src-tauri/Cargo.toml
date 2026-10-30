@@ -22,6 +22,10 @@ tauri-plugin-notification = "2"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_Threading", "Win32_Graphics_Dwm", "Win32_System_ProcessStatus", "Win32_System_SystemInformation"] }
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+# PawnIO kurulumunu indirmek için; tauri-plugin-updater zaten getiriyor (aynı sürüm, rustls).
+reqwest = { version = "0.13", default-features = false }
+# reqwest'in rustls'i sağlayıcısız gelir; güncelleyici gibi ring kullanılır (ek bağımlılık yok).
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
 
 [profile.release]
 opt-level = "s"

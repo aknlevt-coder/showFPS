@@ -22,7 +22,7 @@ pub const AUTOSTART_ARG: &str = "--autostart";
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
 /// C:\Windows\System32 (ortam değişkeninden değil, Windows API'den).
-fn system32() -> PathBuf {
+pub(crate) fn system32() -> PathBuf {
     use windows_sys::Win32::System::SystemInformation::GetSystemDirectoryW;
     let mut buf = [0u16; 260];
     let n = unsafe { GetSystemDirectoryW(buf.as_mut_ptr(), buf.len() as u32) } as usize;
@@ -125,7 +125,7 @@ fn register(name: &str, xml: &str) -> Result<(), String> {
     }
 }
 
-fn base64(data: &[u8]) -> String {
+pub(crate) fn base64(data: &[u8]) -> String {
     const T: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = String::with_capacity(data.len().div_ceil(3) * 4);
     for c in data.chunks(3) {

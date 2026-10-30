@@ -70,7 +70,10 @@
     "longDescription": "Oyunların üzerinde FPS, frametime, CPU/GPU sıcaklığı ve kullanımı, RAM ve VRAM gösteren özelleştirilebilir overlay.",
     "copyright": "© 2026 aknlevt-coder",
     "category": "Utility",
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "resources": {
+      "binaries/PawnIO_setup.exe": "PawnIO_setup.exe"
+    }
   },
   "plugins": {
     "updater": {

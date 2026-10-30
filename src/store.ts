@@ -69,7 +69,7 @@ export function defaultState(): AppState {
       makeProfile("general", L("Genel kullanım", "Everyday"), ["fps", "cpuLoad", "gpuLoad", "ram"]),
     ],
     // Tarayıcıda (Tauri dışı) geliştirirken gerçek veri olmadığı için demo açık başlar.
-    app: { theme: "dark", demoData: !isTauri, minimizeToTray: true, hotkeys: DEFAULT_HOTKEYS, autoHide: false, autoProfile: true, baseProfileId: null, notifyCritical: true, autoRecord: false, onboarded: false, lang: systemLang() },
+    app: { theme: "dark", demoData: !isTauri, minimizeToTray: true, hotkeys: DEFAULT_HOTKEYS, autoHide: false, autoProfile: true, baseProfileId: null, notifyCritical: false, autoRecord: false, onboarded: false, lang: systemLang() },
     locked: false,
     overlayVisible: true,
     overlayPosition: null,

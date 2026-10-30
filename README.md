@@ -28,7 +28,7 @@
 2. Windows SmartScreen "tanınmayan uygulama" derse **Ek bilgi → Yine de çalıştır** (paket henüz kod imzalı değil).
 3. Uygulama her açılışta yönetici izni (UAC) ister: FPS ölçümü ve sensörler bunu gerektirir. "Windows ile başlat" açıksa açılışta UAC sorulmaz.
 
-**CPU sıcaklığı** için ücretsiz [PawnIO](https://pawnio.eu) sürücüsü gerekir; kurulu değilse diğer değerler yine çalışır.
+**CPU sıcaklığı** için gereken [PawnIO](https://pawnio.eu) sürücüsü kurulumla birlikte gelir: bilgisayarda yoksa showFPS kurulurken sessizce kurulur, ayrıca bir şey yapmanız gerekmez. (Kurulum sırasında olmadıysa **Genel bakış → Veri kaynakları**ndaki düğmeyle de kurulabilir.)
 
 Güncellemeler uygulamanın içinden gelir: **Uygulama ayarları → Hakkında → Güncellemeleri denetle**.
 
@@ -69,7 +69,7 @@ docs/           Geliştirici notları ve test rehberi
 
 [MIT](LICENSE) © 2026 aknlevt-coder
 
-Üçüncü taraf bileşenler: [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (MPL-2.0, değiştirilmeden dağıtılır), [Microsoft TraceEvent](https://github.com/microsoft/perfview) (MIT), [Tauri](https://tauri.app) (MIT / Apache-2.0), [sysinfo](https://github.com/GuillaumeGomez/sysinfo) (MIT), [React](https://react.dev) (MIT), [Lucide](https://lucide.dev) (ISC).
+Üçüncü taraf bileşenler: [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (MPL-2.0, değiştirilmeden dağıtılır), [PawnIO](https://github.com/namazso/PawnIO) (GPL-2.0; resmi imzalı kurulumu değiştirilmeden dağıtılır, kaynak kodu bu adreste), [Microsoft TraceEvent](https://github.com/microsoft/perfview) (MIT), [Tauri](https://tauri.app) (MIT / Apache-2.0), [sysinfo](https://github.com/GuillaumeGomez/sysinfo) (MIT), [React](https://react.dev) (MIT), [Lucide](https://lucide.dev) (ISC).
 
 ---
 
@@ -84,6 +84,6 @@ docs/           Geliştirici notları ve test rehberi
 - Critical temperature notifications, global shortcuts, start with Windows, in-app updates.
 - Turkish and English UI. No data is sent anywhere; the only network request is the update check against GitHub.
 
-**Install:** download `showFPS_<version>_x64-setup.exe` from [Releases](https://github.com/aknlevt-coder/showFPS/releases/latest). The installer is not code-signed yet, so SmartScreen may warn: choose **More info → Run anyway**. The app asks for administrator rights (UAC) because FPS capture and sensors need them. CPU temperature needs the free [PawnIO](https://pawnio.eu) driver.
+**Install:** download `showFPS_<version>_x64-setup.exe` from [Releases](https://github.com/aknlevt-coder/showFPS/releases/latest). The installer is not code-signed yet, so SmartScreen may warn: choose **More info → Run anyway**. The app asks for administrator rights (UAC) because FPS capture and sensors need them. The [PawnIO](https://github.com/namazso/PawnIO) driver needed for CPU temperature (GPL-2.0, official signed installer, unmodified) is installed silently with showFPS if it isn't already present.
 
 **License:** [MIT](LICENSE).

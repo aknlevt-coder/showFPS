@@ -42,6 +42,25 @@
   !insertmacro REMOVE_OLD_INSTALL HKLM all
 !macroend
 
+; CPU sıcaklığı (ve CPU saat hızı/gücü) PawnIO sürücüsünü ister. Kurulu değilse kurulumla gelen
+; resmi PawnIO kurulumu sessizce çalıştırılır (scripts/fetch-pawnio.mjs indirir, imzasını doğrular).
+; Zaten kuruluysa (başka bir uygulama da kurmuş olabilir) dokunulmaz. Kaldırırken PawnIO silinmez:
+; başka uygulamalar da kullanıyor olabilir.
+!macro NSIS_HOOK_POSTINSTALL
+  ClearErrors
+  ReadRegStr $0 HKLM "SYSTEM\CurrentControlSet\Services\PawnIO" "ImagePath"
+  ${If} ${Errors}
+  ${AndIf} ${FileExists} "$INSTDIR\PawnIO_setup.exe"
+    DetailPrint "PawnIO sürücüsü kuruluyor (CPU sıcaklığı için)..."
+    ExecWait '"$INSTDIR\PawnIO_setup.exe" -install -silent' $0
+    DetailPrint "PawnIO kurulumu bitti (kod $0)"
+    ; 3010 = ERROR_SUCCESS_REBOOT_REQUIRED: bitiş sayfası yeniden başlatmayı önerir.
+    ${If} $0 = 3010
+      SetRebootFlag true
+    ${EndIf}
+  ${EndIf}
+!macroend
+
 ; Görev yönetici yetkisiyle oluşturuldu; kaldırıcı yetkisiz çalışıyorsa silmek için bir kez UAC.
 !macro DELETE_TASK NAME
   nsExec::Exec 'schtasks.exe /Query /TN "${NAME}"'

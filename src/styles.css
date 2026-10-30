@@ -367,3 +367,8 @@ input[type=range]:disabled { opacity: .4; cursor: default; }
 .update-bar { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; padding: 10px 12px 10px 14px; border-radius: 12px;
   background: var(--accent-soft); border: 1px solid var(--accent); color: var(--text); font-weight: 600; }
 .update-bar svg { color: var(--accent); flex: none; }
+
+/* PawnIO eksik rozeti + kur düğmesi (Veri kaynakları ve ilk açılış rehberi) */
+.pawnio { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pawnio .btn { padding: 4px 10px; font-size: 12px; }
+.pawnio small { flex-basis: 100%; margin: 0; }

@@ -1,5 +1,6 @@
 mod apps;
 mod autostart;
+mod pawnio;
 mod sessions;
 mod usage;
 
@@ -315,6 +316,35 @@ fn sensor_status(sensors: tauri::State<Sensors>) -> serde_json::Value {
 }
 
 /// Sidecar, Tauri tarafından ana exe'nin yanına "lhm-helper.exe" olarak kopyalanır.
+/// PawnIO'yu indirip (imza doğrulanarak) kurar; başarılıysa sensör yardımcısını yeniden başlatır,
+/// çünkü LibreHardwareMonitor sürücüyü yalnız açılışta arar.
+#[tauri::command]
+async fn install_pawnio(app: AppHandle) -> Result<pawnio::Outcome, String> {
+    let outcome = pawnio::install().await?;
+    if !matches!(outcome, pawnio::Outcome::Cancelled) {
+        tauri::async_runtime::spawn_blocking(move || restart_sensor_helper(app)).await.map_err(|e| e.to_string())?;
+    }
+    Ok(outcome)
+}
+
+/// Yardımcıyı kapatıp yeniden açar. stdin kapatılır ki ETW oturumunu düzgün kapatsın.
+fn restart_sensor_helper(app: AppHandle) {
+    if let Some(mut c) = app.state::<Sensors>().child.lock().unwrap().take() {
+        drop(c.stdin.take());
+        for _ in 0..40 {
+            if matches!(c.try_wait(), Ok(Some(_))) {
+                break;
+            }
+            thread::sleep(Duration::from_millis(50));
+        }
+        let _ = c.kill();
+        let _ = c.wait();
+    }
+    // Eski okuyucu iş parçacığı "stopped" durumunu yayınlasın; yenisinin "starting"i ondan sonra gelsin.
+    thread::sleep(Duration::from_millis(300));
+    spawn_sensor_helper(app);
+}
+
 fn spawn_sensor_helper(app: AppHandle) {
     let path = std::env::current_exe()
         .ok()
@@ -412,6 +442,7 @@ pub fn run() {
             get_session,
             delete_session,
             export_csv,
+            install_pawnio,
             set_tray_labels
         ])
         .setup(|app| {

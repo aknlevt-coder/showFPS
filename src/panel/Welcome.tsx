@@ -57,7 +57,7 @@ export function Welcome({ sources, autostart, onClose }: {
           {sources}
           <ul className="wel-list">
             <li>{L("FPS yalnızca bir oyun ön plandayken ölçülür; şu an “Hazır” yazması normaldir.", "FPS is only measured while a game is in front; “Ready” is normal right now.")}</li>
-            <li>{L("CPU sıcaklığı ücretsiz PawnIO sürücüsünü ister (pawnio.eu). Kurulu değilse diğer değerler yine çalışır.", "CPU temperature needs the free PawnIO driver (pawnio.eu). Everything else works without it.")}</li>
+            <li>{L("CPU sıcaklığı ücretsiz PawnIO sürücüsünü ister. Kurulu değilse yukarıdaki “PawnIO'yu kur” düğmesiyle kurabilirsiniz; kurmasanız da diğer değerler çalışır.", "CPU temperature needs the free PawnIO driver. If it's missing, use “Install PawnIO” above; everything else works without it.")}</li>
           </ul>
         </>
       ),

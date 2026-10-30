@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Custom Performance Overlay",
+  "version": "../package.json",
+  "identifier": "io.github.aknlevt-coder.showfps",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build:helper && npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "overlay",
+        "title": "Overlay",
+        "url": "index.html#/overlay",
+        "width": 300,
+        "height": 50,
+        "x": 20,
+        "y": 20,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": false,
+        "resizable": false,
+        "focus": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "binaries/lhm-helper"
+    ],
+    "windows": {
+      "nsis": {
+        "installerHooks": "windows/hooks.nsh",
+        "languages": [
+          "Turkish",
+          "English"
+        ],
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/installer-header.bmp",
+        "sidebarImage": "icons/installer-sidebar.bmp",
+        "installMode": "perMachine"
+      },
+      "signCommand": "node ../scripts/sign.mjs %1"
+    },
+    "publisher": "Custom Performance Overlay",
+    "shortDescription": "Oyun içi FPS ve sistem performansı overlay'i",
+    "longDescription": "Oyunların üzerinde FPS, frametime, CPU/GPU sıcaklığı ve kullanımı, RAM ve VRAM gösteren özelleştirilebilir overlay.",
+    "copyright": "© 2026",
+    "category": "Utility",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlCQThFRjFBN0M4NDUyM0MKUldROFVvUjhHdStvbTN3YkF5WEVGWnBPaVJmS0REV1RhNzVWTjQwNElCV29jWGNsM3dNVjVPYVMK",
+      "endpoints": [
+        "https://github.com/aknlevt-coder/showFPS/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

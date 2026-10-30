@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>lhm-helper</AssemblyName>
+    <RootNamespace>LhmHelper</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Tek dosya, .NET kurulumu gerektirmez (Tauri sidecar olarak paketlenir). -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Sıkıştırma kapalı: sıkıştırılmış tek dosya açılışta belleğe açılır (+24 MB özel RAM, ölçüldü).
+         Exe büyür (42 → 85 MB) ama kurulum paketi zaten sıkıştırıldığı için indirme boyutu az değişir. -->
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <!-- Arka planda sürekli çalışan küçük bir süreç: eşzamanlı GC ve dinamik PGO gereksiz iş yapar
+         (ölçümde CPU %0,06 → %0,02). DATAS, yığını yüke göre küçük tutar. -->
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+    <TieredPGO>false</TieredPGO>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.2.8" />
+  </ItemGroup>
+
+</Project>

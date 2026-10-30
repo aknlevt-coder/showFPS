@@ -1,0 +1,36 @@
+{
+  "name": "custom-performance-overlay",
+  "private": true,
+  "version": "0.1.13",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 1420 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "build:helper": "node scripts/build-helper.mjs",
+    "icons": "node scripts/build-icons.mjs",
+    "package": "node scripts/bump-version.mjs && tauri build",
+    "release": "node scripts/release.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@tauri-apps/api": "^2.1.0",
+    "@tauri-apps/plugin-dialog": "^2.8.4",
+    "@tauri-apps/plugin-global-shortcut": "^2.4.1",
+    "@tauri-apps/plugin-notification": "^2.8.0",
+    "@tauri-apps/plugin-process": "^2.4.0",
+    "@tauri-apps/plugin-updater": "^2.14.1",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

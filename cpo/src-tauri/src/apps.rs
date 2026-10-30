@@ -26,7 +26,8 @@ pub struct RunningApp {
 const SKIP: &[&str] = &[
     "explorer", "applicationframehost", "textinputhost", "shellexperiencehost", "searchhost",
     "startmenuexperiencehost", "systemsettings", "lockapp", "widgets", "msedgewebview2",
-    "custom-performance-overlay", // kurulu ve dev sürümü ayrı süreçler; ikisi de listelenmesin
+    // Uygulamanın kendisi: kurulu sürüm showFPS.exe, dev ve 0.1.13'e kadarki sürümler custom-performance-overlay.exe.
+    "showfps", "custom-performance-overlay",
 ];
 const DWMWA_CLOAKED: u32 = 14;
 

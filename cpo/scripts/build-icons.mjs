@@ -35,10 +35,10 @@ try {
   const shots = {
     // Hoş geldiniz/bitiş sayfalarının solundaki dikey görsel (164×314)
     sidebar: [164, 314, `<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-      background:linear-gradient(165deg,#0c111b 0%,#1e1b4b 70%,#312e81 100%);color:#fff;text-align:center">
+      background:linear-gradient(165deg,#0f0c29 0%,#1b1745 60%,#3c3489 100%);color:#fff;text-align:center">
       ${icon(84)}
-      <div style="font-weight:700;font-size:15px;line-height:1.25">Custom<br>Performance<br>Overlay</div>
-      <div style="font-size:11px;color:#a5b4fc;line-height:1.4">Oyun içi FPS ve<br>sistem göstergesi</div></div>`],
+      <div style="font-weight:700;font-size:20px;letter-spacing:.2px">show<span style="color:#5DCAA5">FPS</span></div>
+      <div style="font-size:11px;color:#c7c3f5;line-height:1.4">FPS · CPU · GPU<br>overlay</div></div>`],
     // Diğer sayfaların üst şeridindeki görsel (150×57, beyaz zemin, solda)
     header: [150, 57, `<div style="height:100%;display:flex;align-items:center;padding-left:10px;background:#fff">${icon(40)}</div>`],
   };

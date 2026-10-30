@@ -412,7 +412,7 @@ pub fn run() {
             let mica = is_windows_11();
             app.manage(WindowInfo { mica });
             let mut main = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
-                .title("Custom Performance Overlay")
+                .title("showFPS")
                 .inner_size(1000.0, 700.0)
                 .min_inner_size(820.0, 560.0)
                 .decorations(false) // başlık çubuğu arayüzde çizilir
@@ -430,7 +430,7 @@ pub fn run() {
             let menu = Menu::with_items(app, &[&show, &quit])?;
             app.manage(TrayItems { show: show.clone(), quit: quit.clone() });
             let mut tray = TrayIconBuilder::new()
-                .tooltip("Custom Performance Overlay")
+                .tooltip("showFPS")
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => show_main(app),

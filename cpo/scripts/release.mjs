@@ -1,6 +1,6 @@
 // Sürüm paketi: sürümü bir artırır, imzalı güncelleme dosyalarıyla derler ve GitHub Releases'e
 // yüklenecek dosyaları release/v<sürüm>/ klasörüne koyar:
-//   CustomPerformanceOverlay_<sürüm>_x64-setup.exe   (kurulum; güncelleyici de bunu indirir)
+//   showFPS_<sürüm>_x64-setup.exe                    (kurulum; güncelleyici de bunu indirir)
 //   latest.json                                       (güncelleyicinin okuduğu dosya)
 // GitHub'da "v<sürüm>" etiketli bir sürüm oluşturup bu iki dosyayı yüklemek yeterli.
 import { execSync } from "node:child_process";
@@ -30,7 +30,7 @@ const conf = JSON.parse(readFileSync(join(root, "src-tauri", "tauri.conf.json"),
 const nsis = join(root, "src-tauri", "target", "release", "bundle", "nsis");
 const built = join(nsis, `${conf.productName}_${version}_x64-setup.exe`);
 // GitHub dosya adlarındaki boşlukları noktaya çevirir; adres tutsun diye boşluksuz ad.
-const asset = `CustomPerformanceOverlay_${version}_x64-setup.exe`;
+const asset = `showFPS_${version}_x64-setup.exe`;
 const out = join(root, "release", `v${version}`);
 mkdirSync(out, { recursive: true });
 copyFileSync(built, join(out, asset));
@@ -40,7 +40,7 @@ const endpoint = conf.plugins.updater.endpoints[0];
 const repo = /github\.com\/([^/]+\/[^/]+)\/releases/.exec(endpoint)?.[1];
 const latest = {
   version,
-  notes: `Custom Performance Overlay ${version}`,
+  notes: `showFPS ${version}`,
   pub_date: new Date().toISOString(),
   platforms: {
     "windows-x86_64": {

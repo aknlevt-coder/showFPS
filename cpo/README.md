@@ -1,4 +1,6 @@
-# Custom Performance Overlay
+# showFPS
+
+(0.1.13'e kadar adı "Custom Performance Overlay" idi.)
 
 Tauri 2 + Rust + React/TypeScript + Vite. Windows 10/11 için özelleştirilebilir performans overlay'i.
 
@@ -125,7 +127,7 @@ PresentMon'un kullandığı ETW sağlayıcıları (Microsoft-Windows-DXGI ve D3D
 
 ## Windows ile başlatma
 - Kurulu sürümde yeniden başlatmayla doğrulandı.
-- Ayar: Uygulama ayarları → "Windows açılınca başlat". Kaynak `state.json` değil, Görev Zamanlayıcı'daki `Custom Performance Overlay` görevidir (`src-tauri/src/autostart.rs`).
+- Ayar: Uygulama ayarları → "Windows açılınca başlat". Kaynak `state.json` değil, Görev Zamanlayıcı'daki `showFPS` görevidir (eski adlı `Custom Performance Overlay` görevi ilk açılışta yeni ada taşınır) (`src-tauri/src/autostart.rs`).
 - Uygulama yönetici istediği için Run anahtarı kullanılamaz (Windows yükseltme isteyen girişleri oturum açılışında atlar). Görev "en yüksek yetkiyle" çalışır: oturum açılışından 10 sn sonra **UAC sormadan** başlar.
 - Görev ayarları: pildeyken de başlar, 72 saatlik süre sınırı kapalı.
 - `--autostart` ile başlatılınca kontrol paneli gizli açılır; overlay ve tepsi simgesi görünür.
@@ -133,6 +135,11 @@ PresentMon'un kullandığı ETW sağlayıcıları (Microsoft-Windows-DXGI ve D3D
 - Kaldırıcı görevi siler (`src-tauri/windows/hooks.nsh`); güncellemede (`/UPDATE`) korunur. Görev yönetici yetkisiyle oluşturulduğu için kaldırıcı silerken bir kez UAC sorabilir.
 - Bilinen sınır: kullanıcı adında Türkçe karakter varsa uygulama görev yolunu her açılışta gereksiz yere yeniden kaydeder (schtasks çıktısı sistem kod sayfasında); işlev bozulmaz.
 - Güvenlik notu: görev exe'yi UAC sormadan yönetici olarak çalıştırır. 0.1.12'den beri exe Program Files'ta (yalnız yönetici yazabilir), bu yüzden kullanıcı yetkisindeki bir program onu değiştirip yetki yükseltemez. Eski sürümlerde (`%LOCALAPPDATA%`) bu risk vardı.
+
+## Ad ve logo (0.1.14)
+- Görünen ad, kurulum klasörü (`C:\Program Files\showFPS`), exe (`showFPS.exe`, `mainBinaryName`) ve Başlat menüsü kısayolu "showFPS". Rust paket adı (`custom-performance-overlay`) iç ad olarak kaldı.
+- Logo: çerçeveli S (`src-tauri/icons/source/app-icon.svg`); köşeler overlay'in ekran köşelerine yerleşimini anımsatır. `npm run icons` tüm ikonları ve kurulum görsellerini üretir.
+- Kurulum eski adlı kurulumu bulursa kaldırır: kullanıcı klasöründeki (0.1.11 ve öncesi, HKCU) ya da Program Files'taki (0.1.12–0.1.13, HKLM). Ayarlar, oturumlar ve otomatik başlatma korunur; eski kısayollar silinir (`hooks.nsh` → `REMOVE_OLD_INSTALL`).
 
 ## Dil
 - Arayüz Türkçe ve İngilizce (`src/i18n.ts`). Metinler yerinde çift olarak yazılır: `L("Kaydet", "Save")`; modül düzeyindeki listeler getter kullanır ki dil değişince güncellensin.
@@ -144,7 +151,7 @@ PresentMon'un kullandığı ETW sağlayıcıları (Microsoft-Windows-DXGI ve D3D
 - `tauri-plugin-updater`: açılıştan 15 sn sonra sessizce, ayrıca Ayarlar → Hakkında → "Güncellemeleri denetle". Yeni sürüm varsa panelde şerit çıkar; kurulum uygulamayı kapatıp yeni sürümü açar (oturum kaydı sürerken düğme kapalı).
 - Adres: `tauri.conf.json → plugins.updater.endpoints` = `https://github.com/aknlevt-coder/showFPS/releases/latest/download/latest.json`. Depoda henüz sürüm yokken denetim "bulunamadı" hatası verir.
 - Paketler bir anahtarla imzalanır; uygulama yalnız bu anahtarla imzalı paketi kurar. Özel anahtar depo dışında: `%USERPROFILE%\.tauri\cpo-updater.key` (parolasız). **Kaybolursa kurulu uygulamalar yeni sürümü kabul etmez; yedekleyin.** Açık anahtar `tauri.conf.json`'da.
-- Yayın: `npm run release` → `release/v<sürüm>/` içinde `CustomPerformanceOverlay_<sürüm>_x64-setup.exe` ve `latest.json`. github.com/aknlevt-coder/showFPS → Releases → Draft a new release → etiket `v<sürüm>` (ör. `v0.1.13`) → iki dosyayı sürükle → Publish release. Etiket adı `latest.json`'daki adresle aynı olmalı.
+- Yayın: `npm run release` → `release/v<sürüm>/` içinde `showFPS_<sürüm>_x64-setup.exe` ve `latest.json`. github.com/aknlevt-coder/showFPS → Releases → Draft a new release → etiket `v<sürüm>` (ör. `v0.1.13`) → iki dosyayı sürükle → Publish release. Etiket adı `latest.json`'daki adresle aynı olmalı.
 - Doğrulanan: imzalı `.sig` ve `latest.json` üretimi. Uçtan uca güncelleme (GitHub'dan indirip kurma) depo olmadığı için denenmedi.
 
 ## Kod imzalama

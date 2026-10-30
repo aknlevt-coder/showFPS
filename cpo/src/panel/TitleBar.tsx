@@ -29,7 +29,7 @@ export function TitleBar() {
   return (
     <header className="titlebar" data-tauri-drag-region>
       <img src="/app-icon.svg" alt="" width={16} height={16} data-tauri-drag-region />
-      <span data-tauri-drag-region>Custom Performance Overlay</span>
+      <span data-tauri-drag-region>showFPS</span>
       <div className="tb-btns">
         <button title={L("Simge durumuna küçült", "Minimize")} onClick={() => w.minimize()}><Minus size={15} /></button>
         <button title={max ? L("Önceki boyut", "Restore") : L("Büyüt", "Maximize")} onClick={() => w.toggleMaximize()}>{max ? <Copy size={13} /> : <Square size={13} />}</button>

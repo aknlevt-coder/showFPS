@@ -38,7 +38,7 @@ export function Welcome({ sources, autostart, onClose }: {
               </select>
             </Row>
           </div>
-          <p>{L("Performance Overlay; FPS, sıcaklık ve kullanım değerlerini oyunun üzerinde küçük bir şerit olarak gösterir.", "Performance Overlay shows FPS, temperatures and usage as a small strip on top of your game.")}</p>
+          <p>{L("showFPS; FPS, sıcaklık ve kullanım değerlerini oyunun üzerinde küçük bir şerit olarak gösterir.", "showFPS shows FPS, temperatures and usage as a small strip on top of your game.")}</p>
           <ul className="wel-list">
             <li>{L("Overlay şu an ekranda:", "The overlay is currently at:")} <b>{anchor}</b>. {L("Konumu Genel bakış'tan değiştirebilirsiniz.", "You can move it on the Overview page.")}</li>
             <li>{L("Bu pencereyi kapatınca uygulama kapanmaz, saatin yanındaki tepsi simgesine iner. Tamamen çıkmak için simgeye sağ tıklayıp Çıkış.", "Closing this window doesn't quit the app; it goes to the tray icon next to the clock. To quit, right-click the icon and choose Quit.")}</li>

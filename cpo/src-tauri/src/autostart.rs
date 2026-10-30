@@ -8,7 +8,9 @@
 use std::{os::windows::process::CommandExt, process::Command};
 
 /// Kaldırıcı da bu adı kullanır (src-tauri/windows/hooks.nsh) — değiştirirseniz orayı da güncelleyin.
-pub const TASK_NAME: &str = "Custom Performance Overlay";
+pub const TASK_NAME: &str = "showFPS";
+/// 0.1.13'e kadarki ad; varsa ilk açılışta yeni ada taşınır (iki görev iki kopya başlatırdı).
+const OLD_TASK_NAME: &str = "Custom Performance Overlay";
 /// Görevle başlatıldığında ana pencere gizli açılır (yalnızca overlay + tepsi).
 pub const AUTOSTART_ARG: &str = "--autostart";
 
@@ -37,15 +39,15 @@ fn xml_escape(s: &str) -> String {
 }
 
 /// Görev kayıtlıysa, çalıştıracağı exe yolunu döndürür.
-fn registered_command() -> Option<String> {
-    let xml = schtasks(&["/Query", "/TN", TASK_NAME, "/XML"]).ok()?;
+fn registered_command(name: &str) -> Option<String> {
+    let xml = schtasks(&["/Query", "/TN", name, "/XML"]).ok()?;
     let start = xml.find("<Command>")? + "<Command>".len();
     let end = xml[start..].find("</Command>")? + start;
     Some(xml[start..end].replace("&amp;", "&"))
 }
 
 pub fn is_enabled() -> bool {
-    registered_command().is_some()
+    registered_command(TASK_NAME).is_some()
 }
 
 pub fn enable() -> Result<(), String> {
@@ -60,7 +62,7 @@ pub fn enable() -> Result<(), String> {
     let xml = format!(
         r#"<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo><Description>Custom Performance Overlay'i oturum açılınca başlatır.</Description></RegistrationInfo>
+  <RegistrationInfo><Description>showFPS'i oturum açılınca başlatır.</Description></RegistrationInfo>
   <Triggers>
     <LogonTrigger><Enabled>true</Enabled><UserId>{user}</UserId><Delay>PT10S</Delay></LogonTrigger>
   </Triggers>
@@ -107,7 +109,14 @@ pub fn refresh_path_if_enabled() {
     if cfg!(debug_assertions) {
         return;
     }
-    let (Some(cmd), Ok(exe)) = (registered_command(), std::env::current_exe()) else { return };
+    if registered_command(OLD_TASK_NAME).is_some() {
+        // Ad değişikliği: kullanıcının açık bıraktığı otomatik başlatma yeni adla sürsün.
+        if enable().is_ok() {
+            let _ = schtasks(&["/Delete", "/TN", OLD_TASK_NAME, "/F"]);
+        }
+        return;
+    }
+    let (Some(cmd), Ok(exe)) = (registered_command(TASK_NAME), std::env::current_exe()) else { return };
     if !cmd.eq_ignore_ascii_case(&exe.to_string_lossy()) {
         let _ = enable();
     }

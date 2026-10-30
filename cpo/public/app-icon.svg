@@ -1,21 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <!-- Uygulama simgesinin kaynağı. Değiştirince: npm run icons -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <!-- showFPS simgesinin kaynağı: çerçeveli S. Köşeler overlay'in ekran köşelerine yerleşimini anımsatır. Değiştirince: npm run icons -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#38bdf8"/>
-      <stop offset="1" stop-color="#6366f1"/>
+      <stop offset="0" stop-color="#3C3489"/>
+      <stop offset="1" stop-color="#1B1745"/>
     </linearGradient>
     <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity=".26"/>
-      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#bg)"/>
-  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#shine)"/>
-  <!-- Gösterge: merkez (512,580), yarıçap 260, 270° yay (alttan açık) -->
-  <path d="M328.2,763.8 A260,260 0 1 1 695.8,763.8" fill="none" stroke="#ffffff" stroke-opacity=".32" stroke-width="72" stroke-linecap="round"/>
-  <!-- Dolu kısım: %70 -->
-  <path d="M328.2,763.8 A260,260 0 1 1 722.3,427.1" fill="none" stroke="#ffffff" stroke-width="72" stroke-linecap="round"/>
-  <line x1="512" y1="580" x2="665.7" y2="468.3" stroke="#ffffff" stroke-width="60" stroke-linecap="round"/>
-  <circle cx="512" cy="580" r="58" fill="#ffffff"/>
+  <rect x="4" y="4" width="92" height="92" rx="22" fill="url(#bg)"/>
+  <rect x="4" y="4" width="92" height="92" rx="22" fill="url(#shine)"/>
+  <path d="M20 33 V20 H33 M67 20 H80 V33 M80 67 V80 H67 M33 80 H20 V67" fill="none" stroke="#5DCAA5" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M62 37 C56 30 38 30 37 41 C36 51 64 49 63 60 C62 71 42 71 37 64" fill="none" stroke="#ffffff" stroke-width="10.5" stroke-linecap="round"/>
 </svg>

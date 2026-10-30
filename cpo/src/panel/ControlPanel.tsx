@@ -154,7 +154,7 @@ export function ControlPanel() {
       <aside className="side">
         <div className="brand">
           <img className="brand-mark" src="/app-icon.svg" alt="" width={32} height={32} />
-          <div><b>Performance Overlay</b><small>{L("Sistem ve FPS göstergesi", "System and FPS monitor")}</small></div>
+          <div><b>show<span className="brand-accent">FPS</span></b><small>{L("Sistem ve FPS göstergesi", "System and FPS monitor")}</small></div>
         </div>
         {NAV.map(({ id, label, Icon }) => (
           <button key={id} className={`nav-btn${section === id ? " active" : ""}`} onClick={() => setSection(id)}>
@@ -762,7 +762,7 @@ function AboutCard() {
       <div className="about">
         <img src="/app-icon.svg" alt="" width={48} height={48} />
         <div className="grow">
-          <b>Custom Performance Overlay</b>
+          <b>showFPS</b>
           <div className="hint" style={{ margin: 0 }}>{L("Sürüm", "Version")} {__APP_VERSION__} · {L("Derleme", "Build")} {buildDate()} · Windows 10/11</div>
         </div>
         {isTauri && <UpdateButton />}
@@ -964,7 +964,7 @@ function TestNotification() {
   const [msg, setMsg] = useState("");
   const send = () => {
     setMsg(L("Gönderiliyor…", "Sending…"));
-    sendNotices([{ title: "Custom Performance Overlay", body: L("Test bildirimi: kritik sıcaklık uyarıları bu şekilde görünecek.", "Test notification: critical temperature alerts will look like this.") }])
+    sendNotices([{ title: "showFPS", body: L("Test bildirimi: kritik sıcaklık uyarıları bu şekilde görünecek.", "Test notification: critical temperature alerts will look like this.") }])
       .then((r) => setMsg(r === "sent"
         ? L("Gönderildi. Görmediyseniz Windows Ayarlar → Sistem → Bildirimler'de uygulamanın ve Rahatsız etme'nin durumuna bakın.", "Sent. If you didn't see it, check the app and Do not disturb under Windows Settings → System → Notifications.")
         : L("Windows bildirim izni verilmedi. Ayarlar → Sistem → Bildirimler'den açabilirsiniz.", "Windows notification permission was not granted. You can turn it on in Settings → System → Notifications.")))

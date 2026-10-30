@@ -90,6 +90,7 @@ html.overlay-root, html.overlay-root body { background: transparent; overflow: h
 .brand-mark { width: 34px; height: 34px; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(56, 189, 248, .3)); }
 .brand b { display: block; font-size: 14px; letter-spacing: -.01em; }
 .brand small { color: var(--faint); font-size: 11px; }
+.brand-accent { color: #2bb58c; } /* logodaki köşe yeşili; iki temada da okunur */
 .nav-btn { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0; border-radius: 9px;
   background: transparent; color: var(--muted); cursor: pointer; text-align: left; font: inherit; transition: background .15s, color .15s; }
 .nav-btn:hover { background: var(--hover); color: var(--text); }

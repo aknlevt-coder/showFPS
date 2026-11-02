@@ -186,13 +186,18 @@ pub fn refresh_path_if_enabled() {
     }
     if registered_command(OLD_TASK_NAME).is_some() {
         // Ad değişikliği: kullanıcının açık bıraktığı otomatik başlatma yeni adla sürsün.
-        if enable().is_ok() {
+        let r = enable();
+        log::info!("otomatik başlatma: eski adlı görev taşınıyor: {r:?}");
+        if r.is_ok() {
             let _ = schtasks(&["/Delete", "/TN", OLD_TASK_NAME, "/F"]);
         }
         return;
     }
     let (Some(cmd), Ok(exe)) = (registered_command(TASK_NAME), std::env::current_exe()) else { return };
     if !cmd.eq_ignore_ascii_case(&exe.to_string_lossy()) {
-        let _ = enable();
+        log::info!("otomatik başlatma: görev yolu güncelleniyor ({cmd} → {})", exe.display());
+        if let Err(e) = enable() {
+            log::warn!("otomatik başlatma: görev güncellenemedi: {e}");
+        }
     }
 }

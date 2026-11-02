@@ -525,6 +525,13 @@ function SensorBadge({ st, ok, okText, cpu }: { st: SensorStatus | null; ok: boo
   switch (st?.state) {
     case "running":
       if (cpu && st.info?.pawnIO === false) return <PawnIoInstall />;
+      // Kurulu ama sürücü çalışmıyor: yardımcı başlatmayı denedi; çoğunlukla yeni kurulumdan sonra Windows yeniden başlatılmamıştır.
+      if (cpu && st.info?.isAdmin && st.info.pawnIOState && st.info.pawnIOState !== "RUNNING") {
+        return <span className="badge warn">{L("PawnIO sürücüsü çalışmıyor — Windows'u yeniden başlatın", "PawnIO driver isn't running — restart Windows")}</span>;
+      }
+      if (cpu && st.info?.isAdmin) {
+        return <span className="badge">{L(`Bu işlemcinin sıcaklığı okunamıyor${st.info.cpu ? ` (${st.info.cpu})` : ""}`, `This CPU's temperature can't be read${st.info.cpu ? ` (${st.info.cpu})` : ""}`)}</span>;
+      }
       return st.info?.isAdmin
         ? <span className="badge">{L("Sensör değer vermiyor", "Sensor reports no value")}</span>
         : <span className="badge warn">{L("Okunamadı — yönetici olarak çalıştırın (CPU sıcaklığı sürücü ister)", "Not readable — run as administrator (CPU temperature needs a driver)")}</span>;
@@ -797,6 +804,12 @@ function AboutCard() {
         {isTauri && <UpdateButton />}
       </div>
       <UpdateStatus />
+      {isTauri && (
+        <div className="row">
+          <span>{L("Sorun bildirirken günlük dosyasını (showFPS.log) ekleyin", "When reporting a problem, attach the log file (showFPS.log)")}</span>
+          <span className="row-ctl"><button className="btn ghost" onClick={() => invoke("open_log_dir").catch(console.error)}><FolderOpen size={14} /> {L("Günlük klasörünü aç", "Open log folder")}</button></span>
+        </div>
+      )}
       <table className="credits">
         <tbody>
           {CREDITS.map((c) => (

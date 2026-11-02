@@ -26,6 +26,8 @@ tauri-plugin-process = "2"
 reqwest = { version = "0.13", default-features = false }
 # reqwest'in rustls'i sağlayıcısız gelir; güncelleyici gibi ring kullanılır (ek bağımlılık yok).
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
+tauri-plugin-log = "2"
+log = "0.4"
 
 [profile.release]
 opt-level = "s"

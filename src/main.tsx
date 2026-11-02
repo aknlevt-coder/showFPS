@@ -8,6 +8,14 @@ import { ControlPanel } from "./panel/ControlPanel";
 const isOverlay = location.hash === "#/overlay";
 if (isOverlay) document.documentElement.classList.add("overlay-root");
 
+// Arayüzdeki yakalanmamış hatalar da günlük dosyasına (Rust tarafındaki showFPS.log) yazılsın.
+if ("__TAURI_INTERNALS__" in window) {
+  const where = isOverlay ? "overlay" : "panel";
+  const send = (msg: string) => { import("@tauri-apps/plugin-log").then((l) => l.error(`[${where}] ${msg}`)).catch(() => {}); };
+  window.addEventListener("error", (e) => send(`${e.message} (${e.filename}:${e.lineno})`));
+  window.addEventListener("unhandledrejection", (e) => send(`işlenmemiş: ${String(e.reason)}`));
+}
+
 // Windows 11'de ana pencere Mica ile açılır; arka plan şeffaf olmalı ki Mica görünsün.
 async function detectMica() {
   if (isOverlay || !("__TAURI_INTERNALS__" in window)) return;

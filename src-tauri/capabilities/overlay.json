@@ -12,6 +12,7 @@
     "core:window:allow-set-position",
     "core:window:allow-outer-position",
     "core:window:allow-outer-size",
-    "core:window:allow-available-monitors"
+    "core:window:allow-available-monitors",
+    "log:default"
   ]
 }

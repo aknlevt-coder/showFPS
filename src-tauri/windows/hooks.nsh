@@ -59,6 +59,10 @@
       SetRebootFlag true
     ${EndIf}
   ${EndIf}
+  ; Sürücü "elle başlat" türünde; kurulumdan hemen sonra açılan showFPS bağlanabilsin diye başlat
+  ; (zaten çalışıyorsa ya da yeniden başlatma gerekiyorsa sc hata verir, yok sayılır).
+  nsExec::Exec '"$SYSDIR\sc.exe" start PawnIO'
+  Pop $0
 !macroend
 
 ; Görev yönetici yetkisiyle oluşturuldu; kaldırıcı yetkisiz çalışıyorsa silmek için bir kez UAC.

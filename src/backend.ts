@@ -45,7 +45,7 @@ export interface SensorStatus {
   state?: "starting" | "running" | "missing" | "stopped" | "error";
   message?: string;
   lastError?: string;
-  info?: { isAdmin?: boolean; gpu?: string | null; fps?: string; pawnIO?: boolean }; // fps: "ok" ya da hata mesajı
+  info?: { isAdmin?: boolean; gpu?: string | null; fps?: string; pawnIO?: boolean; pawnIOState?: string | null; cpu?: string | null }; // fps: "ok" ya da hata mesajı
 }
 
 /** LibreHardwareMonitor yardımcı sürecinin durumu; tarayıcıda null. */

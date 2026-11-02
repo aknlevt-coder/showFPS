@@ -134,6 +134,19 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 | İlk açılış rehberi → 2. adım | Aynı düğme orada da var. |
 | Yeni kurulumda ilk açılış rehberi → 3. adım | Dört tercihin hepsi kapalı. |
 
+## 3h. Açılış, CPU sensörü ve günlük (0.1.18)
+| Adım | Beklenen |
+|---|---|
+| "Windows açılınca başlat" açıkken bilgisayarı yeniden başlatın, açılınca masaüstü kısayoluna tıklayın | Panel boş değil, hemen çizilir. |
+| Tepsiden paneli kapatıp tekrar açın, birkaç kez | Her seferinde dolu açılır. |
+| Ayarlar → Hakkında → **Günlük klasörünü aç** | `showFPS.log` içinde başlangıç satırı ("showFPS 0.1.18 başladı…") ve "sensör durumu" satırları. |
+| PawnIO'yu yeni kurmuş bir bilgisayarda Veri kaynakları | CPU sıcaklığı "Canlı"; olmazsa sarı "PawnIO sürücüsü çalışmıyor — Windows'u yeniden başlatın" ya da "Bu işlemcinin sıcaklığı okunamıyor (işlemci adı)". Günlükteki "sensör durumu" satırı neden olduğunu gösterir (`pawnIOState`, `cpu`, `hardware`). |
+
+## 3i. İki ekran kartlı dizüstü (0.1.19)
+| Adım | Beklenen |
+|---|---|
+| AMD işlemci + NVIDIA kartlı dizüstünde Veri kaynakları | GPU satırı NVIDIA kartını gösterir (ör. "RTX 4060 Laptop GPU"), "AMD Radeon(TM) Graphics" değil. GPU sıcaklığı gelir, VRAM kartın gerçek belleğini (ör. 8 GB) gösterir. |
+
 ## 4. Kalıcılık ve başlangıç
 | Adım | Beklenen |
 |---|---|

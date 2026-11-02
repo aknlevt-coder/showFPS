@@ -74,6 +74,39 @@ var ownerPid = ownerArg >= 0 && ownerArg + 1 < args.Length && int.TryParse(args[
 var fps = new FpsTracker(ownerPid);
 AppDomain.CurrentDomain.ProcessExit += (_, _) => fps.Dispose();
 
+// PawnIO sürücüsü (CPU sensörleri) hizmet olarak kurulur ve "elle başlat" türündedir. Yeni kurulmuş ya
+// da yeniden başlatma bekleyen bir sistemde durmuş olabilir; LibreHardwareMonitor açılırken sürücüye
+// bağlanamazsa CPU sıcaklığı hiç gelmez. Yönetici olduğumuz için açmadan önce başlatmayı deneriz.
+var pawnInstalled = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\PawnIO") is not null;
+string? pawnStart = null;
+if (pawnInstalled && isAdmin && PawnIoState() != "RUNNING")
+{
+    pawnStart = RunSc("start PawnIO");
+    for (int i = 0; i < 20 && PawnIoState() != "RUNNING"; i++) Thread.Sleep(100);
+}
+
+// sc.exe çıktısındaki durum: RUNNING, STOPPED, START_PENDING… (yerelleştirilmez).
+static string? PawnIoState()
+{
+    var o = RunSc("query PawnIO");
+    var m = System.Text.RegularExpressions.Regex.Match(o ?? "", @"\b(RUNNING|STOPPED|START_PENDING|STOP_PENDING|PAUSED)\b");
+    return m.Success ? m.Value : null;
+}
+
+static string? RunSc(string arguments)
+{
+    try
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "sc.exe"), arguments)
+        { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+        using var pr = System.Diagnostics.Process.Start(psi)!;
+        var text = pr.StandardOutput.ReadToEnd();
+        pr.WaitForExit(5000);
+        return text;
+    }
+    catch { return null; }
+}
+
 // Anakart: masaüstü fan hızları (SuperIO) için. Dizüstülerde genelde sensör yoktur.
 var computer = new Computer { IsCpuEnabled = true, IsGpuEnabled = true, IsMotherboardEnabled = true };
 try { computer.Open(); }
@@ -108,10 +141,21 @@ static float? Pick(IEnumerable<ISensor> sensors, SensorType type, params string[
     return null;
 }
 
-// Harici GPU'yu entegreye tercih et.
-IHardware? MainGpu() =>
-    computer.Hardware.FirstOrDefault(h => h.HardwareType is HardwareType.GpuNvidia or HardwareType.GpuAmd)
-    ?? computer.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.GpuIntel);
+// Harici GPU'yu tümleşiğe tercih et. AMD işlemcili dizüstülerde tümleşik "AMD Radeon(TM) Graphics"
+// da GpuAmd türünde ve listede NVIDIA'dan önce gelebiliyor; onu seçince sıcaklık hiç gelmiyordu
+// (tümleşik kartta sıcaklık sensörü yok) ve VRAM 1 GB görünüyordu. Sıra: NVIDIA (hep harici),
+// sonra ayrılmış belleği en büyük olan (tümleşik kartlarda ~0,5–2 GB, harici kartlarda 4 GB+).
+IHardware? MainGpu()
+{
+    float DedicatedMb(IHardware h) => SensorsOf(h)
+        .Where(s => s.SensorType == SensorType.SmallData && s.Name is "GPU Memory Total" or "D3D Dedicated Memory Total")
+        .Select(s => s.Value ?? 0).DefaultIfEmpty(0).Max();
+    return computer.Hardware
+        .Where(h => h.HardwareType is HardwareType.GpuNvidia or HardwareType.GpuAmd or HardwareType.GpuIntel)
+        .OrderByDescending(h => h.HardwareType == HardwareType.GpuNvidia)
+        .ThenByDescending(DedicatedMb)
+        .FirstOrDefault();
+}
 
 UpdateAll();
 var gpu = MainGpu();
@@ -122,7 +166,11 @@ Write(new JsonObject
     ["gpu"] = gpu?.Name,
     ["fps"] = fps.Error ?? "ok",
     // LHM 0.9.5+ CPU sensörlerini PawnIO sürücüsüyle okur; kurulu değilse CPU sıcaklığı gelmez.
-    ["pawnIO"] = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\PawnIO") is not null,
+    ["pawnIO"] = pawnInstalled,
+    // Kurulu ama çalışmıyorsa (çoğunlukla yeni kurulum, Windows yeniden başlatılmamış) panel bunu söyler.
+    ["pawnIOState"] = pawnInstalled ? PawnIoState() : null,
+    ["pawnIOStartTried"] = pawnStart is not null,
+    ["cpu"] = computer.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.Cpu)?.Name,
     ["hardware"] = new JsonArray(computer.Hardware.Select(h => (JsonNode)new JsonObject
     {
         ["type"] = h.HardwareType.ToString(),

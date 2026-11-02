@@ -217,8 +217,19 @@ async fn export_csv(app: AppHandle, file_name: String, contents: String) -> Resu
     Ok(Some(path.to_string_lossy().into_owned()))
 }
 
+/// Günlük klasörünü Gezgin'de açar (sorun bildirirken dosyayı bulmak için).
+#[tauri::command]
+fn open_log_dir(app: AppHandle) -> Result<(), String> {
+    let dir = app.path().app_log_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    // explorer.exe Windows klasöründen tam yolla (PATH'teki sahte bir exe çalışmasın).
+    let explorer = autostart::system32().parent().map(|w| w.join("explorer.exe")).ok_or("Windows klasörü yok")?;
+    Command::new(explorer).arg(&dir).spawn().map(|_| ()).map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 fn quit_app(app: AppHandle) {
+    log::info!("çıkış");
     app.exit(0);
 }
 
@@ -267,6 +278,10 @@ fn show_main(app: &AppHandle) {
         let _ = w.show();
         let _ = w.unminimize();
         let _ = w.set_focus();
+        // Arayüz gizliyken çizmez ve görünür olduğunu odak olayından anlıyordu. Oturum açılışında
+        // Windows odağı vermeyebiliyor: pencere görev çubuğunda boş kalıyordu. Doğrudan haber ver.
+        let _ = app.emit_to("main", "panel-shown", ());
+        log::info!("panel gösterildi");
     }
 }
 
@@ -306,6 +321,9 @@ struct Sensors {
 }
 
 fn set_sensor_status(app: &AppHandle, status: serde_json::Value) {
+    // Durum değişimleri seyrek (başlatma, bilgi, hata, durma); "info" donanım/sensör listesini taşır,
+    // destek için günlükte bulunması değerli.
+    log::info!("sensör durumu: {status}");
     *app.state::<Sensors>().status.lock().unwrap() = status.clone();
     let _ = app.emit("sensor-status", status);
 }
@@ -411,7 +429,25 @@ pub fn run() {
     tauri::Builder::default()
         // İkinci kopya açılmaz (otomatik başlatılmışken kısayola tıklanırsa); mevcut panel öne gelir.
         // İki kopya iki sensör yardımcısı ve çakışan ETW oturumu demek olurdu.
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_main(app)))
+        // Günlük: %LOCALAPPDATA%\io.github.aknlevt-coder.showfps\logs\showFPS.log (en fazla ~1 MB,
+        // bir önceki dosya saklanır). Ayarlar → Hakkında → "Günlük klasörünü aç". Diğer eklentilerden
+        // önce: başlangıçtaki sorunlar da yazılsın.
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .targets([
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir { file_name: Some("showFPS".into()) }),
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                ])
+                .level(log::LevelFilter::Info)
+                .max_file_size(1_000_000)
+                .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepOne)
+                .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
+                .build(),
+        )
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            log::info!("ikinci kopya başlatıldı ({args:?}); panel öne getiriliyor");
+            show_main(app)
+        }))
         // Genel kısayollar arayüzden (ana pencere) kaydedilir: Ayarlar → Klavye kısayolları.
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         // Oyunlar sayfasında "Dosyadan seç" (.exe) için.
@@ -443,6 +479,7 @@ pub fn run() {
             delete_session,
             export_csv,
             install_pawnio,
+            open_log_dir,
             set_tray_labels
         ])
         .setup(|app| {
@@ -497,6 +534,11 @@ pub fn run() {
             if !std::env::args().any(|a| a == autostart::AUTOSTART_ARG) {
                 show_main(app.handle());
             }
+            log::info!(
+                "showFPS {} başladı; argümanlar: {:?}; Mica: {mica}",
+                app.package_info().version,
+                std::env::args().skip(1).collect::<Vec<_>>()
+            );
             autostart::refresh_path_if_enabled();
 
             spawn_system_sampler(app.handle().clone());

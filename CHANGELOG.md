@@ -3,6 +3,16 @@
 `npm run release` bu dosyadaki sürüm başlığının altını güncelleme notu olarak kullanır (`latest.json` → `notes`).
 Yeni sürümden önce en üste `## <sürüm>` başlığıyla ekleyin.
 
+## 0.1.19
+
+- Düzeltme: AMD işlemcili ve NVIDIA ekran kartlı dizüstülerde işlemcinin tümleşik "AMD Radeon Graphics" kartı seçiliyordu; GPU sıcaklığı gelmiyor, VRAM 1 GB görünüyordu. Artık harici kart seçilir (önce NVIDIA, sonra ayrılmış belleği en büyük olan).
+
+## 0.1.18
+
+- Düzeltme: bilgisayar açılışında (otomatik başlatma) panel görev çubuğunda boş kalabiliyordu; tıklayınca kapanıyor gibi görünüyordu. Panel artık her gösterildiğinde doğru çizilir.
+- CPU sıcaklığı: PawnIO kurulu ama sürücüsü durmuşsa uygulama onu kendisi başlatır; başlatılamazsa "Windows'u yeniden başlatın", sürücü çalıştığı hâlde okunamıyorsa işlemci adıyla birlikte bildirir. Kurulum da PawnIO'yu kurduktan sonra sürücüyü başlatır.
+- Günlük dosyası: sorunlar artık %LOCALAPPDATA%\io.github.aknlevt-coder.showfps\logs\showFPS.log dosyasına yazılır (Ayarlar → Hakkında → "Günlük klasörünü aç").
+
 ## 0.1.17
 
 - PawnIO sürücüsü artık kurulumla birlikte geliyor: bilgisayarda yoksa showFPS kurulurken sessizce kurulur, CPU sıcaklığı için ayrıca bir şey yapmak gerekmez. Zaten kuruluysa dokunulmaz; showFPS kaldırılınca PawnIO kalır (başka uygulamalar da kullanabilir).

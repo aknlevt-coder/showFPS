@@ -6,7 +6,15 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const run = (cmd) => execSync(cmd, { cwd: root, stdio: "inherit" });
+const run = (cmd) => {
+  try {
+    execSync(cmd, { cwd: root, stdio: "inherit" });
+  } catch (e) {
+    // CI'da hangi adımın düştüğü GitHub'ın herkese açık hata özetinde görünsün.
+    if (process.env.GITHUB_ACTIONS) console.log(`::error::build-helper: "${cmd}" başarısız (çıkış kodu ${e.status})`);
+    throw e;
+  }
+};
 
 const triple = /host: (\S+)/.exec(execSync("rustc -vV", { encoding: "utf8" }))?.[1];
 if (!triple) throw new Error("rustc -vV çıktısında host bulunamadı");

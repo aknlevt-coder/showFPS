@@ -10,6 +10,9 @@ helper/bin/
 helper/obj/
 helper/publish/
 
+# Tanıtım videosu ve kaynakları (depoda tutulmaz)
+tanitim/
+
 # Yayın dosyaları (GitHub Releases'e elle yüklenir; scripts/release.mjs üretir)
 release/
 

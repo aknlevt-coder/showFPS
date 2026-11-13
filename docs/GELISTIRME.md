@@ -30,6 +30,8 @@ Tauri 2 + Rust + React/TypeScript + Vite. Windows 10/11 için özelleştirilebil
 Demo verisi yalnızca "Uygulama ayarları → Demo verisi" açıkken kullanılır ve overlay'de **DEMO** etiketi çıkar.
 
 ## Sensör yardımcısı (`helper/`)
+Beklenmedik kapanmada Rust yardımcıyı yeniden başlatır (2, 4, 8, 16, 32 sn bekleyerek; art arda en fazla 5 kez, 2 dakikadan uzun çalışınca sayaç sıfırlanır). Kapanırken ve bilerek yapılan yeniden başlatmada (PawnIO kurulumu) devreye girmez: `Sensors.generation` / `exiting`. Elle denendi: yardımcı sonlandırıldı, 2 sn sonra yenisi başladı.
+
 .NET 10, tek dosya (~38 MB, .NET kurulumu gerekmez). Tauri sidecar olarak ana exe'nin yanına `lhm-helper.exe` adıyla kopyalanır. Her saniye stdout'a bir JSON satırı yazar (`{"type":"data","gpuTemp":…}`); okunamayan değer `null`'dur. stdin kapanınca kendini sonlandırır; ayrıca uygulama çıkarken öldürülür. Süreç ölürse değerler "—"ye döner ve panelde durum gösterilir.
 
 ## FPS ölçümü

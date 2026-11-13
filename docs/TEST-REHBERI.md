@@ -147,6 +147,15 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 |---|---|
 | AMD işlemci + NVIDIA kartlı dizüstünde Veri kaynakları | GPU satırı NVIDIA kartını gösterir (ör. "RTX 4060 Laptop GPU"), "AMD Radeon(TM) Graphics" değil. GPU sıcaklığı gelir, VRAM kartın gerçek belleğini (ör. 8 GB) gösterir. |
 
+## 3j. Tepsi ve sensör dayanıklılığı (0.1.20)
+| Adım | Beklenen |
+|---|---|
+| Tepsi simgesine sol tıklayın | Panel açılır (menü açılmaz). |
+| Sağ tık → **Overlay'i gizle** | Overlay kaybolur; menü bir dahaki açılışta "Overlay'i göster" der. Panel gizliyken de çalışır. |
+| Sağ tık → **Kilidi aç (taşı)** | Overlay fareyle sürüklenebilir; menü "Kilitle" der. |
+| Dili İngilizceye çevirin, sağ tık | Menü İngilizce (Open control panel / Hide overlay / Unlock (move) / Quit). |
+| Görev Yöneticisi'nde `lhm-helper.exe`'yi sonlandırın | Değerler kısa süre "—" olur, ~2 sn içinde geri gelir. Günlükte "beklenmedik şekilde kapandı … yeniden başlatılıyor". |
+
 ## 4. Kalıcılık ve başlangıç
 | Adım | Beklenen |
 |---|---|

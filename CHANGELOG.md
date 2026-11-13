@@ -3,6 +3,12 @@
 `npm run release` bu dosyadaki sürüm başlığının altını güncelleme notu olarak kullanır (`latest.json` → `notes`).
 Yeni sürümden önce en üste `## <sürüm>` başlığıyla ekleyin.
 
+## 0.1.20
+
+- Sensör yardımcısı beklenmedik şekilde kapanırsa (çökme, sürücü sorunu, sonlandırılma) uygulama onu kendiliğinden yeniden başlatır; değerler "—" olarak takılı kalmaz. Art arda 5 kapanmadan sonra durur ve günlüğe yazar.
+- Tepsi simgesi: sol tık doğrudan paneli açar. Sağ tık menüsünde "Overlay'i göster/gizle" ve "Kilitle / Kilidi aç" eklendi; metinler o anki duruma ve dile göre değişir.
+- GitHub Actions: her push'ta arayüz derlemesi, sensör yardımcısı, Rust clippy ve birim testleri.
+
 ## 0.1.19
 
 - Düzeltme: AMD işlemcili ve NVIDIA ekran kartlı dizüstülerde işlemcinin tümleşik "AMD Radeon Graphics" kartı seçiliyordu; GPU sıcaklığı gelmiyor, VRAM 1 GB görünüyordu. Artık harici kart seçilir (önce NVIDIA, sonra ayrılmış belleği en büyük olan).

@@ -9,7 +9,10 @@ use std::{
     io::{BufRead, BufReader},
     path::PathBuf,
     process::{Child, Command, Stdio},
-    sync::Mutex,
+    sync::{
+        atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering},
+        Mutex,
+    },
     thread,
     time::Duration,
 };
@@ -18,8 +21,8 @@ use serde::Serialize;
 use serde_json::json;
 use sysinfo::System;
 use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
+    menu::{Menu, MenuItem, PredefinedMenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     window::{Effect, EffectState, EffectsBuilder},
     AppHandle, Emitter, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder,
 };
@@ -141,16 +144,19 @@ fn save_state(app: AppHandle, state: serde_json::Value) -> Result<(), String> {
 }
 
 /// locked = true → tıklama geçirgen (fare olayları alttaki pencereye gider).
-struct TrayItems {
-    show: MenuItem<tauri::Wry>,
-    quit: MenuItem<tauri::Wry>,
-}
+/// Tepsi menüsünün metni değişen öğeleri (kimlik → öğe).
+struct TrayItems(std::collections::HashMap<&'static str, MenuItem<tauri::Wry>>);
 
-/// Tepsi menüsü arayüz diliyle (Türkçe / İngilizce) aynı olsun.
+/// Tepsi menüsü arayüz diliyle ve o anki durumla (overlay görünür mü, kilitli mi) aynı olsun.
+/// labels: öğe kimliği → metin (show, overlay, lock, quit).
 #[tauri::command]
-fn set_tray_labels(items: tauri::State<'_, TrayItems>, show: String, quit: String) -> Result<(), String> {
-    items.show.set_text(show).map_err(|e| e.to_string())?;
-    items.quit.set_text(quit).map_err(|e| e.to_string())
+fn set_tray_labels(items: tauri::State<'_, TrayItems>, labels: std::collections::HashMap<String, String>) -> Result<(), String> {
+    for (id, text) in labels {
+        if let Some(item) = items.0.get(id.as_str()) {
+            item.set_text(text).map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -318,7 +324,17 @@ fn spawn_system_sampler(app: AppHandle) {
 struct Sensors {
     child: Mutex<Option<Child>>,
     status: Mutex<serde_json::Value>,
+    /// Her başlatmada artar. Okuyucu iş parçacığı yalnız kendi kuşağı hâlâ geçerliyse yeniden başlatır;
+    /// bilerek yapılan yeniden başlatma (PawnIO kurulumu) eski kuşağı geçersiz kılar.
+    generation: AtomicU64,
+    /// Uygulama kapanıyor: yardımcı yeniden başlatılmaz.
+    exiting: AtomicBool,
+    /// Art arda beklenmedik kapanma sayısı; bir süre sorunsuz çalışınca sıfırlanır.
+    crashes: AtomicU32,
 }
+
+/// Beklenmedik kapanmada en fazla bu kadar art arda yeniden başlatılır (sonra "durdu" kalır, günlüğe yazılır).
+const MAX_HELPER_RESTARTS: u32 = 5;
 
 fn set_sensor_status(app: &AppHandle, status: serde_json::Value) {
     // Durum değişimleri seyrek (başlatma, bilgi, hata, durma); "info" donanım/sensör listesini taşır,
@@ -347,6 +363,8 @@ async fn install_pawnio(app: AppHandle) -> Result<pawnio::Outcome, String> {
 
 /// Yardımcıyı kapatıp yeniden açar. stdin kapatılır ki ETW oturumunu düzgün kapatsın.
 fn restart_sensor_helper(app: AppHandle) {
+    // Eski okuyucunun kendiliğinden yeniden başlatma yapmaması için kuşağı ilerlet.
+    app.state::<Sensors>().generation.fetch_add(1, Ordering::SeqCst);
     if let Some(mut c) = app.state::<Sensors>().child.lock().unwrap().take() {
         drop(c.stdin.take());
         for _ in 0..40 {
@@ -392,6 +410,8 @@ fn spawn_sensor_helper(app: AppHandle) {
     };
     let stdout = child.stdout.take().expect("stdout piped");
     *app.state::<Sensors>().child.lock().unwrap() = Some(child);
+    let generation = app.state::<Sensors>().generation.fetch_add(1, Ordering::SeqCst) + 1;
+    let started = std::time::Instant::now();
     set_sensor_status(&app, json!({ "state": "starting" }));
 
     thread::spawn(move || {
@@ -422,6 +442,30 @@ fn spawn_sensor_helper(app: AppHandle) {
             }),
         );
         set_sensor_status(&app, json!({ "state": "stopped" }));
+
+        // Beklenmedik kapanma (çökme, sürücü sorunu, birinin süreci sonlandırması): ölçüm sessizce
+        // durmasın. Kapanırken ya da bilerek yeniden başlatılırken (kuşak değişti) dokunma.
+        let sensors = app.state::<Sensors>();
+        if sensors.exiting.load(Ordering::SeqCst) || sensors.generation.load(Ordering::SeqCst) != generation {
+            return;
+        }
+        // 2 dakikadan uzun çalıştıysa önceki çökmeler geçmişte kaldı.
+        if started.elapsed() > Duration::from_secs(120) {
+            sensors.crashes.store(0, Ordering::SeqCst);
+        }
+        let n = sensors.crashes.fetch_add(1, Ordering::SeqCst) + 1;
+        if n > MAX_HELPER_RESTARTS {
+            log::error!("sensör yardımcısı {MAX_HELPER_RESTARTS} kez art arda kapandı; yeniden başlatılmıyor");
+            return;
+        }
+        let wait = Duration::from_secs(2u64.pow(n.min(5))); // 2, 4, 8, 16, 32 sn
+        log::warn!("sensör yardımcısı beklenmedik şekilde kapandı ({n}. kez); {} sn sonra yeniden başlatılıyor", wait.as_secs());
+        thread::sleep(wait);
+        let sensors = app.state::<Sensors>();
+        if !sensors.exiting.load(Ordering::SeqCst) && sensors.generation.load(Ordering::SeqCst) == generation {
+            sensors.child.lock().unwrap().take(); // biten sürecin tutamacı
+            spawn_sensor_helper(app.clone());
+        }
     });
 }
 
@@ -503,15 +547,34 @@ pub fn run() {
             main.build()?;
 
             // Metinler arayüz dili seçilince set_tray_labels ile değişir.
+            // Metinler arayüz dili ve durumla set_tray_labels üzerinden güncellenir. Overlay ve kilit
+            // durumu arayüzdeki depoda yaşar; öğeler panele olay gönderir (panel gizliyken de çalışır).
             let show = MenuItem::with_id(app, "show", "Kontrol panelini aç", true, None::<&str>)?;
+            let overlay = MenuItem::with_id(app, "overlay", "Overlay'i gizle", true, None::<&str>)?;
+            let lock = MenuItem::with_id(app, "lock", "Kilidi aç (taşı)", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Çıkış", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show, &quit])?;
-            app.manage(TrayItems { show: show.clone(), quit: quit.clone() });
+            let sep1 = PredefinedMenuItem::separator(app)?;
+            let sep2 = PredefinedMenuItem::separator(app)?;
+            let menu = Menu::with_items(app, &[&show, &sep1, &overlay, &lock, &sep2, &quit])?;
+            app.manage(TrayItems(std::collections::HashMap::from([
+                ("show", show.clone()), ("overlay", overlay.clone()), ("lock", lock.clone()), ("quit", quit.clone()),
+            ])));
             let mut tray = TrayIconBuilder::new()
-                .tooltip("showFPS")
+                // Geliştirme derlemesi kurulu sürümle aynı anda açıkken tepside ayırt edilebilsin.
+                .tooltip(if cfg!(debug_assertions) { "showFPS (geliştirme)" } else { "showFPS" })
                 .menu(&menu)
+                // Sol tık paneli açar; menü sağ tıkla.
+                .show_menu_on_left_click(false)
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
+                        show_main(tray.app_handle());
+                    }
+                })
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => show_main(app),
+                    id @ ("overlay" | "lock") => {
+                        let _ = app.emit_to("main", "tray-action", id);
+                    }
                     "quit" => {
                         // Süren oturum kaydı kaydedilsin: panel kaydı yazıp quit_app çağırır.
                         // Panel cevap vermezse (donmuş vb.) 2 sn sonra yine de çık.
@@ -549,6 +612,7 @@ pub fn run() {
         .expect("Tauri uygulaması başlatılamadı")
         .run(|app, event| {
             if let RunEvent::Exit = event {
+                app.state::<Sensors>().exiting.store(true, Ordering::SeqCst);
                 if let Some(mut c) = app.state::<Sensors>().child.lock().unwrap().take() {
                     // Önce stdin'i kapat: yardımcı ETW oturumunu kapatıp kendisi çıksın.
                     // Doğrudan öldürülürse oturum sistemde açık kalır.

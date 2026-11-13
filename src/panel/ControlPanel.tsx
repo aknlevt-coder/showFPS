@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { listen } from "@tauri-apps/api/event";
 import {
   Activity, Brush, Database, Download, ChevronDown, ChevronUp, Eye, FileJson, Image, LayoutDashboard, LayoutGrid,
   MonitorCog, Palette, Plus, Radar, RotateCcw, Settings, SlidersHorizontal, Sparkles, Trash2, TriangleAlert, Type, Upload, Users, Keyboard, GripVertical, Info, Move, Gamepad2, FolderOpen, AppWindow, Cpu, History,
@@ -85,8 +86,30 @@ export function ControlPanel() {
 
   useEffect(() => {
     document.documentElement.lang = s.app.lang;
-    if (isTauri) invoke("set_tray_labels", { show: L("Kontrol panelini aç", "Open control panel"), quit: L("Çıkış", "Quit") }).catch(console.error);
   }, [s.app.lang]);
+
+  // Tepsi menüsü: dil ve o anki durum (overlay görünür mü, kilitli mi) metinlere yansır.
+  useEffect(() => {
+    if (!isTauri) return;
+    invoke("set_tray_labels", {
+      labels: {
+        show: L("Kontrol panelini aç", "Open control panel"),
+        overlay: s.overlayVisible ? L("Overlay'i gizle", "Hide overlay") : L("Overlay'i göster", "Show overlay"),
+        lock: s.locked ? L("Kilidi aç (taşı)", "Unlock (move)") : L("Kilitle", "Lock"),
+        quit: L("Çıkış", "Quit"),
+      },
+    }).catch(console.error);
+  }, [s.app.lang, s.overlayVisible, s.locked]);
+
+  // Tepsi menüsündeki overlay/kilit öğeleri (panel gizliyken de çalışır).
+  useEffect(() => {
+    if (!isTauri) return;
+    const un = listen<string>("tray-action", ({ payload }) => {
+      if (payload === "overlay") update((x) => ({ ...x, overlayVisible: !x.overlayVisible }));
+      else if (payload === "lock") update((x) => ({ ...x, locked: !x.locked }));
+    });
+    return () => { un.then((f) => f()); };
+  }, []);
 
   // Oyun algılama ve otomasyonlar (panel gizliyken de çalışır).
   const game = useGameState(live, s, sensors?.info?.fps === "ok");

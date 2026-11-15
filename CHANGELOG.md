@@ -3,6 +3,13 @@
 `npm run release` bu dosyadaki sürüm başlığının altını güncelleme notu olarak kullanır (`latest.json` → `notes`).
 Yeni sürümden önce en üste `## <sürüm>` başlığıyla ekleyin.
 
+## 0.1.21
+
+- Düzeltme: tam ekran oyunlarda (ör. League of Legends "Tam ekran") overlay oyunun arkasında kalıp görünmüyordu. Ön plandaki pencere ekranı kapladığı sürece overlay saniyede bir yeniden en üste alınır (odak çalmadan).
+- Düzeltme: opaklık 0'a çekilince cam yüzeyli temalarda (Aurora, Cam, Gün batımı) beyazımsı cam katmanı, kenar ve ışık çizgisi kalıyordu; overlay hiç tam saydam olmuyordu. Cam efekti ve kart düzeninin zeminleri artık opaklıkla birlikte azalır.
+- Düzeltme: tema kartlarındaki önizleme geniş göstergelerde iki yandan kesiliyordu; artık karta sığacak kadar küçülür.
+- CI: imza denetimi GitHub Actions'ta (PowerShell 7 ortamı) çalışmıyordu; Windows PowerShell artık devralınan modül yolu olmadan başlatılır.
+
 ## 0.1.20
 
 - Sensör yardımcısı beklenmedik şekilde kapanırsa (çökme, sürücü sorunu, sonlandırılma) uygulama onu kendiliğinden yeniden başlatır; değerler "—" olarak takılı kalmaz. Art arda 5 kapanmadan sonra durur ve günlüğe yazar.

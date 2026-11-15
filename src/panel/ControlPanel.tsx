@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
@@ -416,7 +416,7 @@ export function ControlPanel() {
                       };
                       return (
                         <button key={th.id} className={`theme${active ? " active" : ""}`} onClick={() => patchOverlay(applied)}>
-                          <span className="theme-scene"><Overlay settings={preview} t={t} demo={false} /></span>
+                          <FitScene><Overlay settings={preview} t={t} demo={false} /></FitScene>
                           <span className="theme-name">{th.name}{active && <span className="badge ok">{L("Seçili", "Selected")}</span>}</span>
                           <span className="theme-desc">{th.desc}</span>
                         </button>
@@ -470,6 +470,29 @@ export function ControlPanel() {
     </div>
     </div>
   );
+}
+
+/**
+ * Tema kartındaki önizleme: overlay karttan genişse sığacak kadar küçültülür. Önceden geniş
+ * göstergelerde (ör. "LOW 112/107 FPS") şerit iki yandan kesiliyordu.
+ */
+function FitScene({ children }: { children: ReactNode }) {
+  const box = useRef<HTMLSpanElement>(null);
+  const inner = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const b = box.current, i = inner.current;
+    if (!b || !i) return;
+    const fit = () => {
+      const avail = b.clientWidth - 12, need = i.scrollWidth;
+      i.style.transform = need > avail && need > 0 ? `scale(${avail / need})` : "";
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(b);
+    ro.observe(i);
+    return () => ro.disconnect();
+  }, []);
+  return <span className="theme-scene" ref={box}><span className="theme-fit" ref={inner}>{children}</span></span>;
 }
 
 function Profiles() {

@@ -40,7 +40,9 @@ Güncellemeler uygulamanın içinden gelir: **Uygulama ayarları → Hakkında �
 | `Ctrl + Shift + L` | Kilitle / taşımak için kilidi aç |
 | `Ctrl + Alt + R` | Oturum kaydını başlat / bitir |
 
-Hepsi **Uygulama ayarları → Klavye kısayolları**'ndan değiştirilebilir. Tepsi simgesine sol tık paneli açar; sağ tık menüsünden overlay gizlenip gösterilebilir ve kilitlenebilir.
+Hepsi **Uygulama ayarları → Klavye kısayolları**'ndan değiştirilebilir.
+
+Tam ekran oyunlarda overlay oyunun üstünde tutulur. Görünmüyorsa oyunun "tam ekran iyileştirmeleri" kapatılmış olabilir (exe → Özellikler → Uyumluluk); oyunu kenarlıksız moda almak da çözer. Tepsi simgesine sol tık paneli açar; sağ tık menüsünden overlay gizlenip gösterilebilir ve kilitlenebilir.
 
 ## Geliştirme
 

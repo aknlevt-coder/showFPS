@@ -2,6 +2,7 @@ mod apps;
 mod autostart;
 mod pawnio;
 mod sessions;
+mod topmost;
 mod usage;
 
 use std::{
@@ -605,6 +606,7 @@ pub fn run() {
             autostart::refresh_path_if_enabled();
 
             spawn_system_sampler(app.handle().clone());
+            topmost::spawn(app.handle().clone());
             spawn_sensor_helper(app.handle().clone());
             Ok(())
         })

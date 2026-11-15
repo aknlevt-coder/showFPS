@@ -25,11 +25,16 @@ function verify(file) {
   const ps = `$s = Get-AuthenticodeSignature -LiteralPath '${f}'; ` +
     `if ($s.Status -eq 'Valid' -and $s.SignerCertificate.Subject -match '(^|, )CN=namazso\\.eu(,|$)' -and $s.SignerCertificate.Subject -match '(^|, )O=namazso(,|$)') ` +
     `{ 'OK ' + (Get-Item -LiteralPath '${f}').VersionInfo.ProductVersion } else { 'NO ' + $s.Status + ' | ' + $s.StatusMessage + ' | ' + $s.SignerCertificate.Subject }`;
+  // PowerShell 7 altında (GitHub Actions) PSModulePath 7'nin modüllerini gösterir; Windows PowerShell
+  // 5.1 onu devralınca imza modülünü yükleyemiyor ve boş sonuç dönüyordu. Değişkensiz başlatılınca
+  // 5.1 kendi varsayılan yolunu kullanır.
+  const env = { ...process.env };
+  for (const k of Object.keys(env)) if (k.toLowerCase() === "psmodulepath") delete env[k];
   try {
-    const out = execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", ps], { encoding: "utf8" }).trim();
+    const out = execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", ps], { encoding: "utf8", env, stdio: ["ignore", "pipe", "pipe"] }).trim();
     return out.startsWith("OK ") ? { version: out.slice(3) || "?" } : { why: out.slice(3) };
   } catch (e) {
-    return { why: String(e.message || e).split("\n")[0] };
+    return { why: `${String(e.stderr || "").trim().split("\n")[0] || String(e.message || e).split("\n")[0]}` };
   }
 }
 

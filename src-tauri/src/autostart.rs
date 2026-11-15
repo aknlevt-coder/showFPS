@@ -114,6 +114,8 @@ fn register(name: &str, xml: &str) -> Result<(), String> {
     );
     let utf16: Vec<u8> = script.encode_utf16().flat_map(|u| u.to_le_bytes()).collect();
     let out = Command::new(system32().join(r"WindowsPowerShell\v1.0\powershell.exe"))
+        // PowerShell 7'den devralınan modül yolu 5.1'in kendi modüllerini yükletmiyor.
+        .env_remove("PSModulePath")
         .args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-EncodedCommand", &base64(&utf16)])
         .creation_flags(CREATE_NO_WINDOW)
         .output()

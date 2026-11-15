@@ -156,6 +156,15 @@ Notlar: Kare kare veri (%1 düşük, frametime) FPS ölçümü gibi yönetici ye
 | Dili İngilizceye çevirin, sağ tık | Menü İngilizce (Open control panel / Hide overlay / Unlock (move) / Quit). |
 | Görev Yöneticisi'nde `lhm-helper.exe`'yi sonlandırın | Değerler kısa süre "—" olur, ~2 sn içinde geri gelir. Günlükte "beklenmedik şekilde kapandı … yeniden başlatılıyor". |
 
+## 3k. Saydamlık, temalar ve tam ekran (0.1.21)
+| Adım | Beklenen |
+|---|---|
+| Aurora temasında Overlay düzenleyici → Arka plan → Opaklık %0 | Overlay'in zemini, cam parlaklığı ve kenarı tamamen kaybolur; yalnız yazılar kalır. %50'de yarı saydam, %100'de tam dolu. |
+| Kart düzeninde opaklık %0 | Göstergelerin küçük kutu zeminleri de kaybolur. |
+| Sensör seçiminde 6–8 gösterge açın, Görünüm ve tema | Tüm tema kartlarında önizleme kesilmeden, karta sığar. |
+| League of Legends'ı "Tam ekran" modunda açın | Oyun açıldıktan en geç ~1 sn sonra overlay oyunun üstünde görünür. |
+| Hâlâ görünmüyorsa | Oyunun exe'sine sağ tık → Özellikler → Uyumluluk → "Tam ekran iyileştirmelerini devre dışı bırak" işaretli olmamalı; ya da oyunu "Kenarlıksız" moda alın. |
+
 ## 4. Kalıcılık ve başlangıç
 | Adım | Beklenen |
 |---|---|

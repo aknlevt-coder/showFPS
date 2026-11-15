@@ -37,11 +37,18 @@ export const Overlay = forwardRef<HTMLDivElement, Props>(function Overlay({ sett
   const perFrame = s.graph === "frametime" && !!frames && frames.length > 1;
   const k = s.scale;
   const items = s.metrics.filter((m) => m.enabled);
-  const bg = hexToRgba(s.bgColor, s.bgOpacity);
+  const o = Math.min(1, Math.max(0, s.bgOpacity));
+  const bg = hexToRgba(s.bgColor, o);
+  const glass = s.surface === "glass";
+  // Cam yüzeyin parlaklığı, kenarı ve üst ışık çizgisi de opaklıkla ölçeklenir: önceden opaklık 0'da
+  // bile beyazımsı cam katmanı kalıyor, overlay hiç tam saydam olmuyordu. "İnce kenarlık" ayrı bir
+  // seçenek olduğu için opaklıktan bağımsız kalır.
+  const borderAlpha = s.outline ? (glass ? Math.max(0.22, 0.28 * o) : 0.22) : glass ? 0.28 * o : 0;
   const style = {
     "--k": k,
-    background: s.surface === "glass"
-      ? `linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.03)), ${bg}`
+    "--glass": o,
+    background: glass
+      ? `linear-gradient(135deg, rgba(255,255,255,${(0.16 * o).toFixed(3)}), rgba(255,255,255,${(0.03 * o).toFixed(3)})), ${bg}`
       : bg,
     color: s.textColor,
     fontFamily: FONTS[s.font],
@@ -49,7 +56,7 @@ export const Overlay = forwardRef<HTMLDivElement, Props>(function Overlay({ sett
     fontSize: s.fontSize * k,
     fontWeight: s.fontWeight,
     gap: s.gap * k,
-    border: s.outline || s.surface === "glass" ? `1px solid ${hexToRgba(s.textColor, s.surface === "glass" ? 0.28 : 0.22)}` : undefined,
+    border: borderAlpha > 0 ? `1px solid ${hexToRgba(s.textColor, borderAlpha)}` : undefined,
   } as CSSProperties;
   const showLabel = s.showLabels || s.layout === "card" || s.layout === "detailed";
   const cls = [

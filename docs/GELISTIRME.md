@@ -47,6 +47,7 @@ PresentMon'un kullandığı ETW sağlayıcıları (Microsoft-Windows-DXGI ve D3D
 - Teşhis: yönetici terminalde `helper\publish\lhm-helper.exe --fps-test` 15 sn boyunca gelen ETW olaylarını ve süreçleri yazar.
 
 ## Bilinen riskler
+- Tam ekran oyunlar: oyun kendini en üst katmana aldığı için overlay arkada kalabiliyordu; `src-tauri/src/topmost.rs` ön plandaki pencere ekranı kapladığı sürece overlay'i saniyede bir `HWND_TOPMOST` yapar (odak almadan). Gerçek özel tam ekran ("tam ekran iyileştirmeleri" kapalı) modunda hiçbir pencere görünemez; kenarlıksız mod önerilir. Ekranı kaplayan, en üstte, ön plandaki bir test penceresiyle denendi: overlay 600 ms içinde üste çıktı, odak test penceresinde kaldı.
 - CPU sıcaklığı için iki şart var: uygulama yönetici olarak çalışmalı **ve PawnIO sürücüsü kurulu olmalı** (https://pawnio.eu). LHM 0.9.6 CPU'yu yalnızca PawnIO ile okur, eski WinRing0 desteği kaldırılmıştır. Panel, PawnIO eksikse bunu ayrıca gösterir.
 - Tam ekran (exclusive) oyunlarda pencere overlay'i görünmeyebilir; kenarlıksız pencereli modda çalışması beklenir.
 - Hem CPU sıcaklığı hem FPS (ETW) için uygulamanın yönetici olarak çalışması gerekir (ETW için Performance Log Users üyeliği de yeterli olabilir).
